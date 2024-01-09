@@ -1,0 +1,4 @@
+- source: project
+  netlify:
+    - id: 7a33adbc-8936-462a-be83-e9c96df4f38e
+      url: 'https://blog.panliyong.nl'
