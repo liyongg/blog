@@ -1,5 +1,5 @@
 ---
-title: "🇳🇱 🇨🇳 ✌🏻"
+title: "About"
 image: profile.jpeg
 about:
   template: trestles
@@ -15,23 +15,21 @@ about:
 comments: false
 ---
 
-## Bio
+## 🇳🇱 🇨🇳 ✌🏻
 
-Yo!
-I am Li Yong, but most people know me as Michel.
-I like to play videogames with friends, passionately watch Real Madrid play football and love to spend time with my girlfriend.
+Hey there! 
+I'm Li Yong, aka Michel. 
+When I'm not doing tech savvy things, you'll likely find me enjoying video games with friends or passionately cheering for Real Madrid. 
+I thrive on solving challenging problems, and often find myself thinking faster than I speak & speaking faster than I think.
+Every day, I enjoy pondering ways to *game the system* and exploring questions that often go unnoticed. 
 
-Currently I work as a *Data Scientist* at the *Dutch Ministry of Education, Culture and Science*.
-I have a background in Applied Mathematics at Delft University of Technology.
-I like solving problems; the more difficult the better.
-
-## Education
+### Education
 
 MSc Applied Mathematics \| Delft University of Technology \| 2018 - 2020
 
 BSc Applied Mathematics \| Delft University of Technology \| 2015 - 2018
 
-## Experience
+### Experience
 
 Data Scientist \| Ministry of Education, Culture and Science \| 2021 -
 

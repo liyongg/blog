@@ -5,6 +5,7 @@ website:
   title: "Li Yong Pan"
   site-url: https://blog.panliyong.nl
   description: "Personal blog of Li Yong Pan"
+  favicon: handsign.svg
   navbar:
     right:
       - text: Blog
