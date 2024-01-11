@@ -16,3 +16,7 @@ format:
       dark: darkly
       light: cosmo
     css: styles.css
+
+comments: 
+  giscus: 
+    repo: liyongg/blog
