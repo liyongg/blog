@@ -7,4 +7,5 @@ freeze: true
 # Enable banner style title blocks
 title-block-banner: true
 
+# Author of all posts
 author: "Li Yong Pan"
