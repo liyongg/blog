@@ -1,8 +1,8 @@
 ---
 title: "What to Expect from this Blog"
-author: "Michel Pan"
 date: "2024-01-09"
 categories: [news]
+comments: false
 ---
 
 On the 9th of January 2024 I decided to start a blog to document small hobby projects publicly.

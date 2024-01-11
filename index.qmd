@@ -1,14 +1,36 @@
 ---
-title: "Blog"
-listing:
-  contents: posts
-  sort: "date desc"
-  type: default
-  categories: true
-  sort-ui: false
-  filter-ui: false
-page-layout: full
-title-block-banner: true
+title: "About"
+image: profile.jpeg
+about:
+  template: trestles
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/panliyong/
+      target: _blank
+    - icon: github
+      text: Github
+      href: https://github.com/liyongg
+      target: _blank
+comments: false
 ---
 
+## 🇳🇱 🇨🇳 ✌🏻
 
+Hey there! 
+I'm Li Yong, aka Michel. 
+When I'm not doing tech savvy things, you'll likely find me enjoying video games with friends or passionately cheering for Real Madrid. 
+I thrive on solving challenging problems, and often find myself thinking faster than I speak & speaking faster than I think.
+Every day, I enjoy pondering ways to *game the system* and exploring questions that often go unnoticed. 
+
+### Education
+
+MSc Applied Mathematics \| Delft University of Technology \| 2018 - 2020
+
+BSc Applied Mathematics \| Delft University of Technology \| 2015 - 2018
+
+### Experience
+
+Data Scientist \| Ministry of Education, Culture and Science \| 2021 -
+
+Junior Data Scientist \| Apeiron Insight \| 2019 - 2021
