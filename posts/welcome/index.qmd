@@ -3,6 +3,8 @@ title: "What to Expect from this Blog"
 date: "2024-01-09"
 categories: [news]
 comments: false
+description: Tempering Expectations
+image: ../media/missing.svg
 ---
 
 On the 9th of January 2024 I decided to start a blog to document small hobby projects publicly.
@@ -12,5 +14,5 @@ The repository is hosted on GitHub and uses GitHub Actions to update the website
 The current idea of this blog is to write about small personal projects to illustrate proficiency of techniques and applications in primarily data science and web development.
 However, there might also be some one-off useful tips and tricks that I would like to post here.
 I have a few ideas in mind and will try to showcase them in upcoming blog posts.
-Now, after setting up the [About page](https://blog.panliyong.nl/about), the first step is to allow comments on blog posts from GitHub users.
+Now, after setting up the [landing page](../../index.qmd), the first step is to allow comments on blog posts from GitHub users.
 Stay tuned!
