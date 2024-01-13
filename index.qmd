@@ -1,5 +1,5 @@
 ---
-title: "About"
+title: "Li Yong Pan"
 image: profile.jpeg
 about:
   template: trestles
@@ -9,7 +9,7 @@ about:
       href: https://www.linkedin.com/in/panliyong/
       target: _blank
     - icon: github
-      text: Github
+      text: GitHub
       href: https://github.com/liyongg
       target: _blank
 comments: false
@@ -19,7 +19,7 @@ comments: false
 
 Hey there! 
 I'm Li Yong, aka Michel. 
-When I'm not doing tech savvy things, you'll likely find me enjoying video games with friends or passionately cheering for Real Madrid. 
+When I'm not doing tech savvy things, you'll likely find me enjoying video games with friends, passionately cheering for Real Madrid or spending time with my lovely girlfriend.
 I thrive on solving challenging problems, and often find myself thinking faster than I speak & speaking faster than I think.
 Every day, I enjoy pondering ways to *game the system* and exploring questions that often go unnoticed. 
 
