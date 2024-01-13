@@ -1,0 +1,92 @@
+---
+title: "Creating SVG files from raster images using Inkscape"
+date: "2024-01-13"
+categories: [inkscape]
+description: "SVG >>"
+image: inkscape.svg
+---
+
+## Why?
+
+One of the things that bother me a lot, is when graphics are not embedded as an *SVG* file[^1].
+In particular, for graphics shared on the web there should be no reason to use raster images.
+The scalability of the SVG extension is what makes it incredibly powerful when displaying graphics at various sizes: there is no loss of quality when resizing an SVG image.
+This also means that when embedding an SVG image onto a website, resizing the webpage or zooming in and out does not result in blurry images (pixels).
+For some reason I find myself zooming in and out a lot on websites...
+Anyway, there are other reasons to use the SVG format, such as the interactivity it provides when using JavaScript code.
+You can add transitions to the SVG in HTML if you'd fancy.
+Besides the interactivity, it is also easy to edit or modify existing SVG files.
+One of the well-known editing programs is the open source software [Inkscape](https://inkscape.org/ "It's open source and has several other amazing features!").
+
+[^1]: For photographs, screenshots or images with complex details, the raster extensions (PNG, JPG, JPEG) are perfectly fine!
+
+For today, we will be using an existing raster image and use Inkscape to create a graphic that captures the main shapes of the image.
+At the moment of writing, the first blog post did not have an image yet.
+Let's make one!
+
+## MIA
+
+First we have to find a suitable image that we can use for the [first post](../welcome/index.qmd).
+As it is about expectations and what to expect so...
+a question mark should do!
+But what kind of question mark?
+The first one that comes to my mind has to be the iconic *missing ping* from the popular MOBA game: [League of Legends](https://www.leagueoflegends.com/ "MOBA game by Riot Games, since 2009").
+I entered a practice game and cropped a screenshot:
+
+![](missing.jpg){fig-align="center"}
+
+We will be using this `missing.jpg` file and the output will be a `missing.svg` file.
+
+1.  Open Inkscape.
+
+2.  In the top bar, select *File \> Open* or use the shortcut {{< kbd Ctrl+O >}}.
+
+3.  Navigate to the `missing.jpg` file and select it.
+
+4.  If a window of 'jpeg bitmap image import' pops up, I have selected the OK with the following:
+
+    -   Image Importy Type: Embed
+
+    -   Image DPI: From file
+
+    -   Image Rendering Mode: Smooth (optimizeQuality)
+
+5.  A new window of Inkscape opens with the `missing.jpg` file.
+
+6.  Select the image, and in the top bar select *Path \> Trace Bitmap...* or use the shortcut {{< kbd Shift+Alt+B >}}.
+
+7.  The *Trace Bitmap* window should pop up with a preview of the resulting output.
+
+    ::: callout-important
+    ## No preview?
+
+    Make sure to have properly selected the image.
+    :::
+
+The *Trace Bitmap window* allows you to finetune the tracing, by changing settings and clicking *Update* after each modification.
+I will not be going into too much details, as the SVG graphic that I want to create is not of great importance.
+It would also be possible to only focus on the question mark, but after some consideration I actually would like to keep the background.
+
+These are the settings that I used for the final image:
+
+![](settings.png){fig-align="center"}
+
+1.  Click on *OK*.
+    The trace should be available and on top of the original image on the canvas.
+
+2.  Remove the original image.
+
+3.  Resize the canvas to the new SVG object by selecting it first
+
+4.  *File \> Document properties* \> *Resize page to drawing or selection*, or use {{< kbd Ctrl+Shift+R >}}.
+
+5.  *File \> Save As...* or {{< kbd Ctrl+Shift+S >}}.
+
+6.  Save it as `missing.svg` and as a *Plain SVG*.
+
+We are done!
+The output looks like this:
+
+![](/posts/media\missing.svg){fig-align="center" width="150"}
+
+Fun fact: the handsign that serves as both the favicon and logo was also made like this!
