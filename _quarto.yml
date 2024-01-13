@@ -6,9 +6,12 @@ website:
   site-url: https://blog.panliyong.nl
   description: "Personal blog of Li Yong Pan"
   favicon: handsign.svg
+  google-analytics: G-HBT8Z7VKEK
   navbar:
+    logo: handsign.svg
     right:
-      - text: Blog
+      - icon: journal-code
+        text: Blog
         href: blog.qmd
       - icon: github
         href: https://github.com/liyongg
