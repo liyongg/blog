@@ -1,0 +1,158 @@
+---
+title: "Customising Hover Colour for Socials"
+date: "2024-01-14"
+categories: [theme]
+description: "It's the little things"
+---
+
+Even though I usually prefer dark themes for pretty much every app, I do really like the [cosmo](https://bootswatch.com/cosmo/ "Cosmo Bootaswatch CSS theme") theme!
+Out of all available themes that Quarto comes with, I feel that this is one of the most inviting ones.
+In the future I will invest time and develop a personalised dark theme, but for now this should do.
+
+That being said, I was inspecting the site in general and I noticed that hovering the LinkedIn and/or GitHub link made the colour of the border, icon and text change to lightblue:
+
+![](socials_default.png){fig-align="center"}
+
+And that just doesn't seem right to me.
+In particular for the LinkedIn link, we all know that this shade of blue is *not* the same as the LinkedIn blue.
+It would also be more pleasing to the eye if the hover colour on the GitHub button would show the actual colour of the GitHub logo.
+So let's change that!
+
+## Inspecting with DevTools
+
+When inspecting the HTML page, it is clear that the corresponding element is an `a` anchor tag with class `.about-link`.
+We can add our own CSS styles to a custom `theme.scss` file.
+Now we only need to find the colour of the LinkedIn logo, and we can start coding.
+
+Even though [LinkedIn says](https://brand.linkedin.com/content/brand/global/en_us/index/visual-identity/color-palettes "LinkedIn corporate color palette") that the shade of blue is `#0077b5`, a personal HTML inspect shows us it is actually `#0a66c2` in the logo.
+We will choose the latter from here onwards.
+
+Let's see what happens when we try the following rules:
+
+``` {.scss}
+a.about-link:hover {
+    color: #0a66c2;
+}
+```
+
+The result is disappointing.
+Even though a HTML inspection indeed shows that this CSS rule was considered, we needed to be more specific to overrule existing (and more specific) rules.
+If we wanted to write less code, we could have opted for an additional `!important` call after specifying the colour, but that is generally seen as bad practice so we will avoid this hackish solution[^1].
+
+[^1]: In some scenarios it can be quite complex when trying to avoid the use of `!important`.
+    This is not the case for our goal.
+
+To be more specific, we can look at the parent element of the `a` anchor tag.
+HTML inspection shows that the parent `div` is of class `.about-links`.
+We can now try the following:
+
+``` {.scss}
+.about-links > a.about-link:hover {
+    color: #0a66c2;
+}
+```
+
+But still no effect!
+We need to be even more specific, as HTML inspection shows that `div.quarto-about-trestles .about-entity .about-link:hover` is the CSS selector for what we want to target.
+Maybe we can specify the value of the `href` attribute?
+
+``` {.scss}
+.about-links > a.about-link[href="https://www.linkedin.com/in/panliyong/"]:hover {
+    color: #0a66c2;
+}
+```
+
+Now it finally works!
+But this is not robust.
+What if the link happens to change?
+In particular the username could change, while the domain is most likely to stay the same.
+Let's use the CSS selector `[href*="linkedin"]` .
+This will look for elements which have the substring 'linkedin' in its `href` attribute value.
+
+``` {.scss}
+.about-links > a.about-link[href*="linkedin"]:hover {
+    color: #0a66c2;
+}
+```
+
+This is better!
+Now we can do the same for GitHub.
+We can [download the GitHub logo](https://github.com/logos "GitHub Logos and Usage") and inspect the SVG file.
+It says the fill colour is `#24292f`.
+
+``` scss
+.about-links > a.about-link[href*="github"]:hover {
+    color: #24292f;
+}
+```
+
+Combining the rules gives us a satisfying result:
+
+![](hover_about.png){fig-align="center"}
+
+Now the only thing remains are the two social icons on the navbar of the blog.
+In similary fashion we derive the following rules:
+
+``` scss
+a.nav-link[href*="linkedin"]:hover {
+    color: #0a66c2;
+}
+
+a.nav-link[href*="github"]:hover {
+    color: #24292f;
+}
+```
+
+![](hover_navbar.png){fig-align="center"}
+
+So combining both sets of rules in one `theme.scss` file gives:
+
+``` {.scss filename="theme.scss"}
+/*-- scss:rules --*/
+.about-links> a.about-link[href*="linkedin"]:hover {
+    color: #0a66c2;
+}
+
+.about-links> a.about-link[href*="github"]:hover {
+    color: #24292f;
+}
+
+a.nav-link[href*="linkedin"]:hover {
+    color: #0a66c2;
+}
+
+a.nav-link[href*="github"]:hover {
+    color: #24292f;
+}
+```
+
+But it feels like we are repeating too much:
+
+1.  The colours could be stores as variables.
+2.  The nav-link and about-link CSS selector could be reused in case we decide to add more social buttons later.
+
+Keeping this in mind, we can refactor it as follows:
+
+``` {.scss filename="theme.scss"}
+/*-- scss:variables --*/
+
+$color-linkedin: #0a66c2;
+$color-github: #24292f;
+
+/*-- scss:rules --*/
+
+.about-links > a.about-link,
+a.nav-link {
+    &:hover {
+        &[href*="linkedin"] {
+            color: $color-linkedin;
+        }
+
+        &[href*="github"] {
+            color: $color-github;
+        }
+    }
+}
+```
+
+That's all for today, thanks for reading!
