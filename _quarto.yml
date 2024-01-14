@@ -2,26 +2,32 @@ project:
   type: website
 
 website:
+  title: Li Yong Pan
   site-url: https://blog.panliyong.nl
   description: "Personal blog of Li Yong Pan"
   favicon: handsign.svg
+  image: handsign.svg
   google-analytics: G-HBT8Z7VKEK
+  page-navigation: true
+  back-to-top-navigation: true
   navbar:
     logo: handsign.svg
+    collapse-below: sm
     right:
       - icon: journal-code
         text: Blog
         href: blog.qmd
       - icon: github
         href: https://github.com/liyongg
+        target: _blank
       - icon: linkedin
         href: https://www.linkedin.com/in/panliyong/
+        target: _blank
+      - icon: rss
+        href: blog.xml
 format:
   html:
-    theme: 
-      dark: darkly
-      light: cosmo
-    css: styles.css
+    theme: [cosmo, 'theme.scss']
 
 comments: 
   giscus: 

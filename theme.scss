@@ -1,0 +1,19 @@
+/*-- scss:variables --*/
+
+$color-linkedin: #0a66c2;
+$color-github: #24292f;
+
+/*-- scss:rules --*/
+
+.about-links > a.about-link,
+a.nav-link {
+    &:hover {
+        &[href*="linkedin"] {
+            color: $color-linkedin;
+        }
+
+        &[href*="github"] {
+            color: $color-github;
+        }
+    }
+}
