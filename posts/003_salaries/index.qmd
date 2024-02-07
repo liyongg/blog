@@ -292,6 +292,7 @@ fig.add_shape(
 
 fig.update_xaxes(range=[0, 100000])
 fig.update_yaxes(range=[0, 100000])
+fig.update_traces(hovertemplate='Gross Salary: %{x}<br>Net Salary: %{y:.2%}')
 
 fig.show()
 ```
@@ -302,7 +303,7 @@ Somewhat painful, but interesting to see.
 A higher gross salary results in paying more taxes - obviously, as a different result would be quite strange.
 The graph shows that a person with €50k annual salary sees 23.8% of that going to taxes.
 Someone with €100k annual gross salary waives off 38,4% for taxes.
-Theoretically, you cannot pay more than 49,5% of your salary to taxes as it is hardcapped by the tax brackets - $y=0.495$ is an asymptote in 2024.
+Theoretically, not more than 49,5% of your salary can go to taxes as it is hardcapped by the tax brackets - $y=0.495$ is an asymptote in 2024.
 
 ```{python}
 fig = px.scatter(df,
@@ -316,21 +317,30 @@ fig.update_layout(
 )
 
 fig.update_xaxes(range=[0, 100000])
+fig.update_yaxes(tickformat=".0%")
+fig.update_traces(hovertemplate='Gross Salary: %{x}<br>Tax Rate: %{y:.2%}')
 
 fig.show()
+```
+
+Are the values in the `tax_rate` column indeed non-decreasing?
+```{python}
+#| echo: true
+#| code-fold: false
+(df["tax_rate"].diff().iloc[1:] >= 0).all()
 ```
 
 :::
 
 ## Step 4:
 
-```{python}
-x = df['net_salary_yearly'].to_numpy()
-y = df['gross_salary_yearly'].to_numpy()
-```
+Let's train a model in which the gross salary is the dependent variable, and the net salary is the independent variable.
 
 ```{python}
 from sklearn.ensemble import RandomForestRegressor
+
+x = df['net_salary_yearly'].to_numpy()
+y = df['gross_salary_yearly'].to_numpy()
 
 regressor = RandomForestRegressor(n_estimators=1000, random_state=0)
 regressor.fit(x.reshape(-1, 1), y)
