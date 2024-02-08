@@ -2,10 +2,20 @@
 
 # freeze computational output
 # (see https://quarto.org/docs/projects/code-execution.html#freeze)
-freeze: true
+freeze: auto
 
 # Enable banner style title blocks
 title-block-banner: true
 
 # Author of all posts
 author: "Li Yong Pan"
+
+# Add table of contents to page
+toc: true
+
+# Fold-code by default
+code-fold: true
+code-tools: true
+code-block-bg: 'black'
+code-block-border-left: 'white'
+highlight-style: atom-one-dark

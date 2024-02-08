@@ -1,0 +1,455 @@
+---
+title: "Visualising the Conversion of Gross-Net Salaries in the Netherlands"
+date: "2024-01-16"
+categories: [visualisation, machine learning, random forest]
+description: "Neat"
+---
+
+Recently my group of friends were talking about taking on new jobs and of course salary was one of the topics that was talked about.
+One thing someone said that I remember clearly is
+
+> It will always be gross to net salary, never the other way around.
+
+And I just thought… why not?
+Obviously it is very practical to know how much you need to earn gross, if you are interested in earning a set amount a month.
+It shouldn't be too difficult to calculate net salaries based on gross values, and with some interpolation it's quite easy to visualise and compute for arbitrary values.
+Specifically we will try to visualise an answer to the question:
+
+> How much do I need to earn gross, in order to receive a desired net salary per month?
+
+We will do so in the following steps:
+
+1.  Defining classes for `Salary` and `Tax`.
+
+2.  Computing a dataset of net salaries based on gross salaries for steps of €100, from €1k to €100k.
+
+3.  Plotting `net ~ gross` and the tax rate.
+
+4.  Training a model to 'predict' gross salaries based on net salaries.
+
+::: callout-important
+The implementation in this post only considers salaries for persons that have not yet reached the legal age for the basic state pension ([AOW](https://www.svb.nl/en/aow-pension "Algemene Ouderdomswet")).
+Furthermore this post assumes that a person works under payroll for one employer (one source of income) and does not take other benefits into account.
+:::
+
+## Step 1: Defining classes
+
+### Salary {.unnumbered}
+
+A person's salary is usually given by the gross value earned each month.
+In the Netherlands an additional minimum of 8% needs to be added[^1] to that, commonly referred to as *holiday allowance* in Dutch.
+On top of that, another common bonus - but certainly not mandatory - is an additional gross monthly salary accumulated over an entire year.
+In Dutch it is referred to as a *thirteenth month* or a *bonus rate*. 
+The percentage of the bonus rate can vary, while a thirteenth month usually is a fixed gross bonus.
+In particular a thirteenth month would be an additional gross monthly salary, whereas a a bonus rate could be 10% (or more/less) of the entire annual salary.
+
+[^1]: There are some exceptions, as mentioned on <https://business.gov.nl/regulation/holiday-allowance/>
+
+The yearly gross salary is calculated as follows:
+
+$$
+\text{gross yearly salary} = 12 \cdot \text{gross monthly salary} \cdot (1 + p_{\text{holiday}} + p_{\text{bonus rate}})+ \text{bonus}
+$$ {#eq-gross-salary}
+
+for
+
+-   $p_{\text{holiday}} =$ holiday allowance in percentage
+
+-   $p_{\text{bonus}} =$ bonus allowance in percentage
+
+-   $\text{bonus} =$ bonus allowance fixed
+
+A fairly straight-forward calculation!
+Keep in mind that @eq-gross-salary can be extended upon if there are other bonuses.
+
+```{python}
+from typing import Callable, Literal, Union
+import numpy as np
+
+Floats = Union[float, np.ndarray]
+
+
+class Salary():
+    def __init__(self, gross: Floats, holiday_allowance: float = 8.0,
+                 bonus_rate: float = 0, bonus: float = None) -> None:
+        self.gross: Floats = gross
+        self.holiday_allowance: float = holiday_allowance
+        self.bonus_rate: float = bonus_rate
+        self.bonus: float = bonus if bonus is not None else self.gross
+
+    def __str__(self) -> str:
+        formatted_gross = f"€{self.gross:,}"
+        formatted_bonus = f"€{self.bonus:,}"
+
+        return f"Simulating a person with:\n"\
+               f"{'Gross salary per month': <25} {formatted_gross: >10}\n"\
+               f"{'Holiday allowance': <25} {self.holiday_allowance/100: >10.2%}\n"\
+               f"{'Bonus rate': <25} {self.bonus_rate/100: >10.2%}\n"\
+               f"{'Bonus fixed': <25} {formatted_bonus: >10}\n"
+
+    def calculate_gross_salary_yearly(self) -> Floats:
+        rate_bonus: float = (100 + self.holiday_allowance + self.bonus_rate)/100
+        return 12 * self.gross * rate_bonus
+
+
+salary = Salary(3000)
+print(salary)
+```
+
+::: {.callout-note collapse="true"}
+## Redundancy of Salary class
+
+In this post it is actually not necessary to implement a separate class for the salary.
+Ultimately we only need a one-to-one mapping of gross and net salaries on a yearly basis.
+Sometimes it is actually a hindrance to compute this given the gross monthly salary and the allowance/bonus percentages.
+However, I have another project in mind for which this class will come in handy!
+:::
+
+### Tax {.unnumbered}
+
+Implementing the `Tax` class is actually easier than what I had imagined it to be.
+Let's break it down in a few steps to understand what is necessary to perform this calculation.
+First and foremost we have to determine the gross yearly salary in which every allowance or additional gross bonus is included.
+Then we have to compute the values for these three components:
+
+1.  Gross taxes, in Dutch referred to as [tax box 1](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/u-hebt-in-2024-nog-niet-aow-leeftijd "2024, information in Dutch"){target="_blank"}.\
+    The more you earn, the more taxes you have to pay.
+
+2.  [Labour credit](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/heffingskortingen/arbeidskorting/tabel-arbeidskorting-2024 "2024, information in Dutch"){target="_blank"}\
+    This credit is earned for simply working and also depends on the gross salary on a yearly basis.
+    In particular for 2024, you will not get any credit if you earn more than €124,935.
+    The more you earn, the less credit you receive.
+
+3.  [General credit](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/heffingskortingen/algemene_heffingskorting/tabel-algemene-heffingskorting-2024 "2024, information in Dutch"){target="_blank"}\
+    Just like labour credit, general credit is applied all the time but you won't receive any if you earn more than €75,518 gross in 2024.
+    Again, you get less credit the more you earn.
+
+$$
+\text{net taxes} = \text{gross taxes} - (\text{labour credit} + \text{general credit})
+$$ {#eq-net-taxes}
+
+From @eq-net-taxes the relation between net salary and taxes are clear.
+The credit is subtracted from the gross taxes, of which the result is the net taxes that you need to pay.
+Combining @eq-gross-salary and @eq-net-taxes gives @eq-net-salary.
+
+$$
+\text{net yearly salary} = \text{gross yearly salary} - \text{net taxes}
+$$ {#eq-net-salary}
+
+```{python}
+CreditFormulas = dict[tuple[float | int,
+                            float | int], Callable[[float], float]]
+Floats = Union[float, np.ndarray]
+
+credit_labour_2024: CreditFormulas = {
+    (0, 11491): lambda x: 0.08425 * x,
+    (11491, 24821): lambda x: 968 + 0.31433 * (x - 11490),
+    (24821, 39958): lambda x: 5158 + 0.02471 * (x - 24820),
+    (39958, 124935): lambda x: 5532 - 0.06510 * (x - 39958),
+    (124935, float('inf')): lambda x: 0.0
+}
+credit_general_2024: CreditFormulas = {
+    (0, 24813): lambda x: 3362,
+    (24813, 75518): lambda x: 3362 - 0.06630 * (x - 24812),
+    (75518, float('inf')): lambda x: 0.0
+}
+
+tax_brackets_2024 = {
+    (0, 75518): lambda x: 0.3697*x,
+    (75518, float('inf')): lambda x: 0.495*x
+}
+
+
+class Tax():
+    def __init__(self,
+                 tax_brackets: CreditFormulas = tax_brackets_2024,
+                 credit_labour_formulas: CreditFormulas = credit_labour_2024,
+                 credit_general_formulas: CreditFormulas = credit_general_2024
+                 ) -> None:
+
+        self.tax_brackets: list[float] = tax_brackets
+        self.credit_labour_formulas: CreditFormulas = credit_labour_formulas
+        self.credit_general_formulas: CreditFormulas = credit_general_formulas
+
+    def calculate_gross_taxes(self, total_gross: Floats) -> Floats:
+        sum_gross_taxes: Floats = np.zeros_like(total_gross)
+
+        for (lower, upper), tax_formula in self.tax_brackets.items():
+            taxable_income = np.minimum(total_gross, upper) - lower
+            taxable_income = np.maximum(taxable_income, 0)
+            sum_gross_taxes += tax_formula(taxable_income)
+
+        return sum_gross_taxes
+
+    def calculate_credit(self, total_gross, type: Literal['labour', 'general']) -> Floats:
+        ranges_options: dict[str, CreditFormulas] = {
+            'labour': self.credit_labour_formulas,
+            'general': self.credit_general_formulas
+        }
+        salary_ranges = ranges_options[type]
+
+        result = np.zeros_like(total_gross, dtype=float)
+
+        for (l, u), function in salary_ranges.items():
+            mask = np.logical_and(l <= total_gross, total_gross < u)
+            result += np.where(mask, function(total_gross), 0.0)
+
+        return result
+
+    def calculate_net_taxes(self, total_gross: Floats) -> Floats:
+        taxes_gross: Floats = self.calculate_gross_taxes(total_gross)
+        labour_credit: Floats = self.calculate_credit(
+            total_gross, type='labour')
+        general_credit: Floats = self.calculate_credit(
+            total_gross, type='general')
+
+        return np.maximum(
+            taxes_gross - (labour_credit + general_credit), 0)
+
+    def calculate_net_salary(self, total_gross: Floats) -> Floats:
+        # taxes_gross: Floats = self.calculate_gross_taxes(total_gross)
+        # labour_credit: Floats = self.calculate_credit(total_gross, type='labour')
+        # general_credit: Floats = self.calculate_credit(
+        #     total_gross, type='general')
+
+        income_tax: Floats = self.calculate_net_taxes(total_gross)
+
+        return total_gross - income_tax
+
+
+tax = Tax()
+gross_salary = salary.calculate_gross_salary_yearly()
+f"For a person earning {salary.gross} a month, with {salary.holiday_allowance}% holiday allowance and {salary.bonus_rate:.2f}% bonus, the annual net salary is {tax.calculate_net_salary(gross_salary):.2f}"
+```
+
+## Step 2: Computing a dataset of net salaries
+For an an array of gross salaries $x=[1.000, 1.100, ..., 999.900, 1.000.000]$, we can compute the net salaries $y$ by using the `calculate_net_salary()` method in the `Tax` class.
+For some other plots we would like to show some other descriptive figures, such as the amount of tax paid as percentage of a gross salary.
+
+```{python}
+import pandas as pd
+salary_start, salary_stop, step_size = 1, 1000, 0.1
+steps = int((salary_stop - salary_start) / step_size) + 1
+salaries = 1000 * np.linspace(start=salary_start, stop=salary_stop, num=steps)
+gross_salaries = salaries
+gross_taxes = tax.calculate_gross_taxes(gross_salaries)
+labour_credit = tax.calculate_credit(gross_salaries, type='labour')
+general_credit = tax.calculate_credit(gross_salaries, type='general')
+net_taxes = tax.calculate_net_taxes(gross_salaries)
+net_salaries = tax.calculate_net_salary(gross_salaries)
+
+df = pd.DataFrame({
+    "gross_salary_yearly": gross_salaries,
+    "gross_taxes": gross_taxes,
+    'labour_credit': labour_credit,
+    'general_credit': general_credit,
+    'net_taxes': net_taxes,
+    "tax_rate": net_taxes/gross_salaries,
+    "net_salary_yearly": net_salaries,
+    "net_salary_monthly": net_salaries/12,
+    "salary_rate": net_salaries/gross_salaries
+})
+df
+```
+
+## Step 3: Plotting net salaries against gross salaries
+
+In each tab we have plot interactive graphs.
+Try hovering on them!
+Double clicking on each plot toggles between the total range and a fixed range.
+
+::: {.panel-tabset}
+
+## Net ~ Gross
+A first look at the net salaries against gross salaries.
+Plotted alongside is the graph of $y=x$, showcasing the deviation from the ideal scenario where a person would earn net as much as they earn gross.
+However, we still have not answered the main question yet.
+This graph helps with showing how much you earn more net annually if your gross salary increases by €100.
+If your gross salary is €40k, then you earn €33,1k net.
+If that is raised by €100, you will earn €33,15k net.
+```{python}
+import plotly.express as px
+import plotly.io as pio
+
+pio.templates.default = "plotly_dark"
+
+fig = px.scatter(df,
+                 x="gross_salary_yearly",
+                 y="net_salary_yearly", title="Net-Gross Salaries (Yearly)")
+
+fig.update_layout(
+    xaxis_title="Gross Salary",
+    yaxis_title="Net Salary"
+)
+
+fig.add_shape(
+    type='line',
+    x0=df['gross_salary_yearly'].min(),
+    y0=df['gross_salary_yearly'].min(),
+    x1=df['gross_salary_yearly'].max(),
+    y1=df['gross_salary_yearly'].max(),
+    line=dict(dash='dash', color='red')
+)
+
+fig.update_xaxes(range=[0, 100000])
+fig.update_yaxes(range=[0, 100000])
+fig.update_traces(hovertemplate='Gross Salary: €%{x}<br>Net Salary: €%{y}')
+
+fig.show()
+```
+
+## Marginal Tax Rate
+How much of my gross salary goes to taxes? 
+Somewhat painful, but interesting to see.
+A higher gross salary results in paying more taxes - obviously, as a different result would be quite strange.
+The graph shows that a person with €50k annual salary sees 23.8% of that going to taxes.
+Someone with €100k annual gross salary waives off 38,4% for taxes.
+Theoretically, not more than 49,5% of your salary can go to taxes as it is hardcapped by the tax brackets - $y=0.495$ is an asymptote in 2024.
+
+```{python}
+fig = px.scatter(df,
+                 x="gross_salary_yearly",
+                 y="tax_rate",
+                 title="Marginal Tax Rate")
+
+fig.update_layout(
+    xaxis_title="Gross Salary (Yearly)",
+    yaxis_title="Tax Rate"
+)
+
+fig.update_xaxes(range=[0, 100000])
+fig.update_yaxes(tickformat=".0%")
+fig.update_traces(hovertemplate='Gross Salary: €%{x}<br>Tax Rate: %{y:.2%}')
+
+
+fig.show()
+```
+
+Are the values in the `tax_rate` column indeed non-decreasing?
+```{python}
+#| echo: true
+#| code-fold: false
+(df["tax_rate"].diff().iloc[1:] >= 0).all()
+```
+
+:::
+
+## Step 4:
+
+Let's train a model in which the gross salary is the dependent variable, and the net salary is the independent variable.
+We want to train a model which can completely capture the relationship, meaning it has a *mean squared error* of 0.
+We will use a random forest model to try and achieve this.
+First we define $x$ (net) and $y$ (gross) and import the relevant classes and function.
+
+```{python}
+#| echo: true
+#| code-fold: false
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
+
+x = df['net_salary_yearly'].to_numpy() / 12
+y = df['gross_salary_yearly'].to_numpy()
+```
+
+Now we go though some tuning of hyperparameters to achieve the best result.
+
+### `bootstrap`
+```{python}
+#| echo: true
+#| code-fold: false
+regressor = RandomForestRegressor(
+    n_estimators=100, random_state=0, bootstrap=False)
+regressor_lesser = RandomForestRegressor(
+    n_estimators=100, random_state=0, bootstrap=True)
+
+regressor.fit(x.reshape(-1, 1), y)
+regressor_lesser.fit(x.reshape(-1, 1), y)
+
+y_pred = regressor.predict(x.reshape(-1, 1))
+y_pred_lesser = regressor_lesser.predict(x.reshape(-1, 1))
+print(mean_squared_error(y, y_pred))
+print(mean_squared_error(y, y_pred_lesser))
+```
+
+We start with the default amount of trees specified in `RandomForestRegressor` and notice that using the default value of the `bootstrap` argument (`True`) gives us a higher MSE.
+It makes sense, because by using a bootstrap sampling method we introduce randomness in the training process.
+However, we do not want this as we aim to get an MSE value of 0.
+Our data is clean and contains no outliers and as a result bootstrapping would only make our predictions - which in fact are interpolations - worse.
+Therefore in our final model this argument will be set to `False`.
+Notice that the MSE of the first regression model is incredibly close to 0.
+Can we get this to 0?
+
+### `n_estimators`
+
+```{python}
+#| echo: true
+#| code-fold: false
+regressor = RandomForestRegressor(
+    n_estimators=1, random_state=0, bootstrap=False)
+regressor_lesser = RandomForestRegressor(
+    n_estimators=100, random_state=0, bootstrap=False)
+
+regressor.fit(x.reshape(-1, 1), y)
+regressor_lesser.fit(x.reshape(-1, 1), y)
+
+y_pred = regressor.predict(x.reshape(-1, 1))
+y_pred_lesser = regressor_lesser.predict(x.reshape(-1, 1))
+print(mean_squared_error(y, y_pred))
+print(mean_squared_error(y, y_pred_lesser))
+```
+
+As we are not using bootstrap resampling, does it even make sense to use more than 1 tree, let alone 100?
+In theory it would still be possible that each tree captures different aspects of the data.
+Yet coming back to the earlier statement that our dataset is clean and contains little to no hidden patterns, it should not be really beneficial to use multiple trees.
+The MSE of the regressor with only one tree is 0.
+That should mean that we can get the same results when using only a single decision tree.
+
+```{python}
+#| echo: true
+#| code-fold: false
+from sklearn.tree import DecisionTreeRegressor
+
+regressor = RandomForestRegressor(
+    n_estimators=1, random_state=0, bootstrap=False)
+regressor_tree = DecisionTreeRegressor()
+
+regressor.fit(x.reshape(-1, 1), y)
+regressor_tree.fit(x.reshape(-1, 1), y)
+
+y_pred = regressor.predict(x.reshape(-1, 1))
+y_pred_tree = regressor_tree.predict(x.reshape(-1, 1))
+print(np.all(y_pred == y_pred_tree))
+```
+
+So we did not need a random forest after all!
+Of course, we could still go for a random forest with only one tree.
+Now on to the answer of the main question
+
+## TL;DR
+
+> How much do I need to earn gross, in order to receive a desired net salary per month?
+
+
+```{python}
+# | echo: true
+# | code-fold: false
+x = np.arange(start=100, stop=10100, step=100)
+y = regressor_tree.predict(x.reshape(-1, 1))
+
+fig = px.scatter(x=x, y=y, title="Net Salary Monthly - Gross Salary Yearly")
+fig.update_layout(
+    xaxis_title="Net Salary (Monthly)",
+    yaxis_title="Gross Salary (Yearly)"
+)
+
+tickvals = list(range(0, 10001, 1000))
+ticktext = [f"{val//1000}k" if val != 0 else '0' for val in tickvals]
+fig.update_xaxes(tickvals=tickvals, ticktext=ticktext)
+
+fig.update_traces(
+    hovertemplate='Net Salary (Month): €%{x}<br>Gross Salary (Annual): €%{y}')
+
+fig.show()
+```
+
+That’s all for today, thanks for reading!

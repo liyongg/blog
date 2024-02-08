@@ -13,6 +13,7 @@ website:
   navbar:
     logo: handsign.svg
     collapse-below: sm
+    toggle-position: right
     right:
       - icon: journal-code
         text: Blog

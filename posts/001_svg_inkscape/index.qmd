@@ -26,7 +26,7 @@ Let's make one!
 
 ## MIA
 
-First we have to find a suitable image that we can use for the [first post](../welcome/index.qmd).
+First we have to find a suitable image that we can use for the [first post](../000_expectations/index.qmd).
 As it is about expectations and what to expect so...
 a question mark should do!
 But what kind of question mark?
