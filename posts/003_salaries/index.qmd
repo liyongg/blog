@@ -230,7 +230,8 @@ For some other plots we would like to show some other descriptive figures, such 
 import pandas as pd
 salary_start, salary_stop, step_size = 1, 1000, 0.1
 steps = int((salary_stop - salary_start) / step_size) + 1
-gross_salaries = 1000 * np.linspace(start=salary_start, stop=salary_stop, num=steps)
+salaries = 1000 * np.linspace(start=salary_start, stop=salary_stop, num=steps)
+gross_salaries = salaries
 gross_taxes = tax.calculate_gross_taxes(gross_salaries)
 labour_credit = tax.calculate_credit(gross_salaries, type='labour')
 general_credit = tax.calculate_credit(gross_salaries, type='general')
@@ -335,39 +336,100 @@ Are the values in the `tax_rate` column indeed non-decreasing?
 ## Step 4:
 
 Let's train a model in which the gross salary is the dependent variable, and the net salary is the independent variable.
+We want to train a model which can completely capture the relationship, meaning it has a *mean squared error* of 0.
+We will use a random forest model to try and achieve this.
+First we define $x$ (net) and $y$ (gross) and import the relevant classes and function.
 
 ```{python}
+#| echo: true
+#| code-fold: false
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 
-x = df['net_salary_yearly'].to_numpy()
+x = df['net_salary_yearly'].to_numpy() / 12
 y = df['gross_salary_yearly'].to_numpy()
+```
 
-regressor = RandomForestRegressor(n_estimators=1000, random_state=0)
+Now we go though some tuning of hyperparameters to achieve the best result.
+
+### `bootstrap`
+```{python}
+#| echo: true
+#| code-fold: false
+regressor = RandomForestRegressor(
+    n_estimators=100, random_state=0, bootstrap=False)
+regressor_lesser = RandomForestRegressor(
+    n_estimators=100, random_state=0, bootstrap=True)
+
 regressor.fit(x.reshape(-1, 1), y)
+regressor_lesser.fit(x.reshape(-1, 1), y)
+
 y_pred = regressor.predict(x.reshape(-1, 1))
+y_pred_lesser = regressor_lesser.predict(x.reshape(-1, 1))
+print(mean_squared_error(y, y_pred))
+print(mean_squared_error(y, y_pred_lesser))
 ```
 
+We start with the default amount of trees specified in `RandomForestRegressor` and notice that setting that the default value of the `bootstrap` argument (`True`) gives us a higher MSE.
+It makes sense, because by using a bootstrap sampling method we introduce randomness in the training process.
+However, we do not want this as we aim to get an MSE value of 0.
+Our data is clean and contains no outliers and as a result bootstrapping would only make our 'predictions' worse.
+Therefore our final model have this argument set to `False`.
+Notice that the MSE of the first regression model is incredibly close to 0.
+Can we get this to 0?
+
+### `n_estimators`
+
 ```{python}
-import plotly.graph_objects as go
-# y_pred = model.predict(x.reshape(-1, 1))
+#| echo: true
+#| code-fold: false
+regressor = RandomForestRegressor(
+    n_estimators=1, random_state=0, bootstrap=False)
+regressor_lesser = RandomForestRegressor(
+    n_estimators=100, random_state=0, bootstrap=False)
 
-fig = px.scatter(df, x="net_salary_yearly", y="gross_salary_yearly")
-fig.add_trace(go.Scatter(x=x, y=y_pred.reshape(x.shape), mode='markers'))
+regressor.fit(x.reshape(-1, 1), y)
+regressor_lesser.fit(x.reshape(-1, 1), y)
 
-fig.update_xaxes(range=[0, 100000])
-fig.update_yaxes(range=[0, 100000])
-fig.show()
+y_pred = regressor.predict(x.reshape(-1, 1))
+y_pred_lesser = regressor_lesser.predict(x.reshape(-1, 1))
+print(mean_squared_error(y, y_pred))
+print(mean_squared_error(y, y_pred_lesser))
 ```
 
+As we are not using bootstrap resampling, does it even make sense to use more than 1 tree, let alone 100?
+In theory it would still be possible that each tree captures different aspects of the data.
+Yet coming back to the earlier mentioned statement that our dataset is clean and contains little to no hidden patterns, it should not be really beneficial to use multiple trees.
+The MSE of the regressor with only one tree is 0.
+That should mean that we can get the same results when using only a single decision tree.
+
 ```{python}
-# y_pred = model.predict(x.reshape(-1, 1))
-y_pred = regressor.predict(gross_salaries.reshape(-1, 1))
+#| echo: true
+#| code-fold: false
+from sklearn.tree import DecisionTreeRegressor
 
+regressor = RandomForestRegressor(
+    n_estimators=1, random_state=0, bootstrap=False)
+regressor_tree = DecisionTreeRegressor()
 
-fig = px.scatter(x=y, y=y_pred)
-fig.add_trace(go.Scatter(x=y, y=x, mode='markers'))
+regressor.fit(x.reshape(-1, 1), y)
+regressor_tree.fit(x.reshape(-1, 1), y)
 
-fig.update_xaxes(range=[0, 100000])
-fig.update_yaxes(range=[0, 100000])
+y_pred = regressor.predict(x.reshape(-1, 1))
+y_pred_tree = regressor_tree.predict(x.reshape(-1, 1))
+print(np.all(y_pred == y_pred_tree))
+```
+
+So we did not need a random forest after all!
+Now on to the answer of the main question
+
+```{python}
+x = np.arange(start=100, stop=10000, step=100)
+y = regressor_tree.predict(x.reshape(-1, 1))
+
+fig = px.scatter(x=x, y=y)
+
+# fig.update_xaxes(range=[0, 10000])
+# fig.update_yaxes(range=[0, 100000])
 fig.show()
 ```
