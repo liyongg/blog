@@ -1,7 +1,7 @@
 ---
-title: "Visualising the Conversion of Gross-Nett Salaries in the Netherlands"
+title: "Visualising the Conversion of Gross-Net Salaries in the Netherlands"
 date: "2024-01-16"
-categories: [visualisation]
+categories: [visualisation, machine learning, random forest]
 description: "Neat"
 ---
 
@@ -15,21 +15,21 @@ Obviously it is very practical to know how much you need to earn gross, if you a
 It shouldn't be too difficult to calculate net salaries based on gross values, and with some interpolation it's quite easy to visualise and compute for arbitrary values.
 Specifically we will try to visualise an answer to the question:
 
-> How much more do I need to earn gross, in order to earn €100 euro more per month net?
+> How much do I need to earn gross, in order to receive a desired net salary per month?
 
 We will do so in the following steps:
 
 1.  Defining classes for `Salary` and `Tax`.
 
-2.  Computing a dataset of net salaries based on gross salaries for steps of €100, from €1k to €20k
+2.  Computing a dataset of net salaries based on gross salaries for steps of €100, from €1k to €100k.
 
-3.  Plotting `net ~ gross`
+3.  Plotting `net ~ gross` and the tax rate.
 
-4.  Interpolating the data and training a simple model.
+4.  Training a model to 'predict' gross salaries based on net salaries.
 
 ::: callout-important
 The implementation in this post only considers salaries for persons that have not yet reached the legal age for the basic state pension ([AOW](https://www.svb.nl/en/aow-pension "Algemene Ouderdomswet")).
-Furthermore this post assumes that a person works under payroll for one employer (one source of income).
+Furthermore this post assumes that a person works under payroll for one employer (one source of income) and does not take other benefits into account.
 :::
 
 ## Step 1: Defining classes
@@ -39,9 +39,9 @@ Furthermore this post assumes that a person works under payroll for one employer
 A person's salary is usually given by the gross value earned each month.
 In the Netherlands an additional minimum of 8% needs to be added[^1] to that, commonly referred to as *holiday allowance* in Dutch.
 On top of that, another common bonus - but certainly not mandatory - is an additional gross monthly salary accumulated over an entire year.
-In Dutch it is referred to as a *year-end bonus* or a *bonus rate*. Although these terms are used interchangeably they are not necessarily the same.
-A year-end bonus can vary, while a thirteenth month usually is a fixed gross bonus.
-In particular a thirteenth month would be an additional gross monthly salary, whereas a year-end bonus could be 10% (or more/less) of the entire annual salary.
+In Dutch it is referred to as a *thirteenth month* or a *bonus rate*. 
+The percentage of the bonus rate can vary, while a thirteenth month usually is a fixed gross bonus.
+In particular a thirteenth month would be an additional gross monthly salary, whereas a a bonus rate could be 10% (or more/less) of the entire annual salary.
 
 [^1]: There are some exceptions, as mentioned on <https://business.gov.nl/regulation/holiday-allowance/>
 
@@ -110,17 +110,17 @@ However, I have another project in mind for which this class will come in handy!
 Implementing the `Tax` class is actually easier than what I had imagined it to be.
 Let's break it down in a few steps to understand what is necessary to perform this calculation.
 First and foremost we have to determine the gross yearly salary in which every allowance or additional gross bonus is included.
-Then we have to compute the values for these three things:
+Then we have to compute the values for these three components:
 
-1.  Compute the gross taxes, in Dutch referred to as [tax box 1](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/u-hebt-in-2024-nog-niet-aow-leeftijd "2024, information in Dutch"){target="_blank"}.\
+1.  Gross taxes, in Dutch referred to as [tax box 1](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/boxen_en_tarieven/overzicht_tarieven_en_schijven/u-hebt-in-2024-nog-niet-aow-leeftijd "2024, information in Dutch"){target="_blank"}.\
     The more you earn, the more taxes you have to pay.
 
-2.  Compute the [labour credit](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/heffingskortingen/arbeidskorting/tabel-arbeidskorting-2024 "2024, information in Dutch"){target="_blank"}\
+2.  [Labour credit](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/heffingskortingen/arbeidskorting/tabel-arbeidskorting-2024 "2024, information in Dutch"){target="_blank"}\
     This credit is earned for simply working and also depends on the gross salary on a yearly basis.
     In particular for 2024, you will not get any credit if you earn more than €124,935.
     The more you earn, the less credit you receive.
 
-3.  Compute the [general credit](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/heffingskortingen/algemene_heffingskorting/tabel-algemene-heffingskorting-2024 "2024, information in Dutch"){target="_blank"}\
+3.  [General credit](https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/heffingskortingen/algemene_heffingskorting/tabel-algemene-heffingskorting-2024 "2024, information in Dutch"){target="_blank"}\
     Just like labour credit, general credit is applied all the time but you won't receive any if you earn more than €75,518 gross in 2024.
     Again, you get less credit the more you earn.
 
@@ -254,7 +254,7 @@ df
 
 ## Step 3: Plotting net salaries against gross salaries
 
-In each tab we have plot informative and interactive graphs.
+In each tab we have plot interactive graphs.
 Try hovering on them!
 Double clicking on each plot toggles between the total range and a fixed range.
 
@@ -275,11 +275,11 @@ pio.templates.default = "plotly_dark"
 
 fig = px.scatter(df,
                  x="gross_salary_yearly",
-                 y="net_salary_yearly", title="Net-Gross Salaries")
+                 y="net_salary_yearly", title="Net-Gross Salaries (Yearly)")
 
 fig.update_layout(
-    xaxis_title="Gross Salary (Yearly)",
-    yaxis_title="Net Salary (Yearly)"
+    xaxis_title="Gross Salary",
+    yaxis_title="Net Salary"
 )
 
 fig.add_shape(
@@ -293,7 +293,7 @@ fig.add_shape(
 
 fig.update_xaxes(range=[0, 100000])
 fig.update_yaxes(range=[0, 100000])
-fig.update_traces(hovertemplate='Gross Salary: %{x}<br>Net Salary: %{y:.2%}')
+fig.update_traces(hovertemplate='Gross Salary: €%{x}<br>Net Salary: €%{y}')
 
 fig.show()
 ```
@@ -319,7 +319,8 @@ fig.update_layout(
 
 fig.update_xaxes(range=[0, 100000])
 fig.update_yaxes(tickformat=".0%")
-fig.update_traces(hovertemplate='Gross Salary: %{x}<br>Tax Rate: %{y:.2%}')
+fig.update_traces(hovertemplate='Gross Salary: €%{x}<br>Tax Rate: %{y:.2%}')
+
 
 fig.show()
 ```
@@ -370,11 +371,11 @@ print(mean_squared_error(y, y_pred))
 print(mean_squared_error(y, y_pred_lesser))
 ```
 
-We start with the default amount of trees specified in `RandomForestRegressor` and notice that setting that the default value of the `bootstrap` argument (`True`) gives us a higher MSE.
+We start with the default amount of trees specified in `RandomForestRegressor` and notice that using the default value of the `bootstrap` argument (`True`) gives us a higher MSE.
 It makes sense, because by using a bootstrap sampling method we introduce randomness in the training process.
 However, we do not want this as we aim to get an MSE value of 0.
-Our data is clean and contains no outliers and as a result bootstrapping would only make our 'predictions' worse.
-Therefore our final model have this argument set to `False`.
+Our data is clean and contains no outliers and as a result bootstrapping would only make our predictions - which in fact are interpolations - worse.
+Therefore in our final model this argument will be set to `False`.
 Notice that the MSE of the first regression model is incredibly close to 0.
 Can we get this to 0?
 
@@ -399,7 +400,7 @@ print(mean_squared_error(y, y_pred_lesser))
 
 As we are not using bootstrap resampling, does it even make sense to use more than 1 tree, let alone 100?
 In theory it would still be possible that each tree captures different aspects of the data.
-Yet coming back to the earlier mentioned statement that our dataset is clean and contains little to no hidden patterns, it should not be really beneficial to use multiple trees.
+Yet coming back to the earlier statement that our dataset is clean and contains little to no hidden patterns, it should not be really beneficial to use multiple trees.
 The MSE of the regressor with only one tree is 0.
 That should mean that we can get the same results when using only a single decision tree.
 
@@ -421,15 +422,34 @@ print(np.all(y_pred == y_pred_tree))
 ```
 
 So we did not need a random forest after all!
+Of course, we could still go for a random forest with only one tree.
 Now on to the answer of the main question
 
+## TL;DR
+
+> How much do I need to earn gross, in order to receive a desired net salary per month?
+
+
 ```{python}
-x = np.arange(start=100, stop=10000, step=100)
+# | echo: true
+# | code-fold: false
+x = np.arange(start=100, stop=10100, step=100)
 y = regressor_tree.predict(x.reshape(-1, 1))
 
-fig = px.scatter(x=x, y=y)
+fig = px.scatter(x=x, y=y, title="Net Salary Monthly - Gross Salary Yearly")
+fig.update_layout(
+    xaxis_title="Net Salary (Monthly)",
+    yaxis_title="Gross Salary (Yearly)"
+)
 
-# fig.update_xaxes(range=[0, 10000])
-# fig.update_yaxes(range=[0, 100000])
+tickvals = list(range(0, 10001, 1000))
+ticktext = [f"{val//1000}k" if val != 0 else '0' for val in tickvals]
+fig.update_xaxes(tickvals=tickvals, ticktext=ticktext)
+
+fig.update_traces(
+    hovertemplate='Net Salary (Month): €%{x}<br>Gross Salary (Annual): €%{y}')
+
 fig.show()
 ```
+
+That’s all for today, thanks for reading!
