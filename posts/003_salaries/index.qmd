@@ -1,8 +1,9 @@
 ---
-title: "Visualising the Conversion of Gross-Net Salaries in the Netherlands"
-date: "2024-01-16"
-categories: [visualisation, machine learning, random forest]
+title: "How much do you need to earn to reach your desired net income?"
+date: "2024-02-08"
+categories: [visualisation, machine learning]
 description: "Neat"
+image: salaries.svg
 ---
 
 Recently my group of friends were talking about taking on new jobs and of course salary was one of the topics that was talked about.
@@ -431,8 +432,9 @@ Now on to the answer of the main question
 
 
 ```{python}
-# | echo: true
-# | code-fold: false
+#| echo: true
+#| code-fold: false
+#| classes: preview-image
 x = np.arange(start=100, stop=10100, step=100)
 y = regressor_tree.predict(x.reshape(-1, 1))
 
