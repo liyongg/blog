@@ -1,0 +1,75 @@
+---
+title: "Covering anime songs using my own voice!"
+date: "2024-02-14"
+categories: [machine learning, pytorch]
+description: "My singing is not good, but hear me out..."
+---
+
+Let's sing!
+I have seen multiple AI/voice cloned covers of songs on YouTube which made me want to try and create one myself using my own voice.
+After some research I have decided to use the following GitHub repo as a starting point: [voicepaw/so-vits-svc-fork](https://github.com/voicepaw/so-vits-svc-fork).
+Following the ending of Season 2 of the Jujutsu Kaisen anime[^1], I would like to infer the audio of the first opening and final ending of that season:
+
+[^1]: Definitely recommended to watch this anime!
+
+{{< video https://www.youtube.com/watch?v=gcgKUcJKxIs >}}
+
+{{< video https://www.youtube.com/watch?v=fR0tqhqM7Yg >}}
+
+I thought it would also be fun to compare between models based on regular speech or singing voice.
+Ultimately we will end up with four inferences: two audio samples with two models give four inferences.
+We will do so in the following steps:
+
+1.  Preparing the datasets
+2.  Training the models
+3.  Inferring audio samples
+
+## Step 1: Preparing the datasets
+
+### Recording my voice
+
+My initial idea was to record voice using a headset, but after recording some sentences and songs I decided to steer away from the headset and use my mobile phone.
+For the recordings, I used my **OnePlus Open**.
+At the end of the post I will have listed all the specs when training this model.
+
+For a voice model based on *regular speech* I used the [Harvard Sentences](https://www.cs.columbia.edu/~hgs/audio/harvard.html) up until the 10th list.
+I had already done some trial and error on training the model with a local GPU and going past the 10th list would arguably be too much given the scope of this post.
+The regular speech recording duration is approximately 4 minutes and 25 seconds.
+
+For a voice model based on *singing voice* I sang the song [Count on You](https://www.youtube.com/watch?v=BO3q9t52s3I) from Big Time Rush because it recently popped up in my YouTube feed and I felt like it could capture a decent range of my voice[^2].
+The singing voice recording duration is approximately 3 minutes and 13 seconds.
+
+[^2]: I am still an atrocious singer and (hopefully) no one will get their hands on the audio file, but still.
+
+After recording I had connected my phone to my PC and simply copied the `.wav` files to the working directory.
+
+::: {.callout-note appearance="simple"}
+## Control and Test
+
+You might wonder: why would you not sing the songs that are meant to be inferred for an even better comparison?
+I could have done that, but that would give me more incentive to actually share the control samples which I really prefer not to.
+:::
+
+### Cutting and clipping in Audacity
+
+Now that we have two recordings, we have to cut and clip them in samples with a duration no longer than 10 seconds.
+If we would fail to do so, we will run into *out of memory* (VRAM of GPU) issues when training the model.
+I used the open-source software [Audacity](https://www.audacityteam.org/) in which I imported the audio samples and cut them into multiple samples.
+There are definitely tools out there to perform this exact task online, and one is even included in the code that we will be using.
+However I found the `svc pre-split` command not to give adequate results for my samples, after which I decided to do this manually.
+In a more serious setting or when you have much more data than I do, I would recommend looking at automated audio-splitter and segmenters.
+
+For the regular speech model we ended up with 101 samples with durations varying from 1 to 4 seconds.
+
+For the singing voice model we ended up with 27 samples with durations varying from 1 to 10 seconds.
+
+This makes sense: reading sentences sequentially gives more natural pauses which implies more cuts (more samples).
+It also does not take a long time to read a sentence.
+On the other hand: a song is much less predictable when it comes to pauses.
+Therefore it is perfectly valid to have a non-silent segment for (longer than) 10 seconds.
+
+## Step 2: Training the models
+
+## Step 3: Inferring audio samples
+
+For inference we first have to separate the vocals from a song, such that we can apply our model on the vocals only.
