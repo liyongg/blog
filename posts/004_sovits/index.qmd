@@ -134,6 +134,42 @@ The `-fm crepe` option specifies the CREPE (Convolutional Representation for Pit
 Regardless of the pitch estimation method, it is necessary to compute the *fundamental frequency* $f_0$ .
 You can think of it as the (non-unique) lowest tone we hear when a person talks or sings.
 
+### Tweaking config.json
+
+In `./configs/44k/config.json` there are a few settings to tweak before training.
+The most important one to tweak would be the `batch_size`.
+It was set to 20 by default but it did not take into account the VRAM which for the GPU that will be used to train the model.
+I will use my **NVIDIA GTX 1080** which 'only' has 8GB of VRAM.
+As other users have reported to run into out-of-memory issues for a `batch_size=16` with 12GB, I chose to go the safe route and set a `batch_size=10`.
+
+Next would be the amount of steps, which can be indirectly computed by specifying the `epochs`:
+
+$$
+\text{epoch} = \frac{\#\text{samples}}{\text{batch size}}=\# \text{steps}
+$$
+
+For a fixed amount of samples, a larger batch size results in less steps to complete an entire epoch.
+Other users have said to report decent results with no less than 25k steps.
+So for our regular speech model, 101 samples would mean that each epoch needs around 10 steps to complete.
+For 25k steps we would therefore need to train for `epochs=2500`.
+However, I was careless at this stage and kept the regular speech model at `epochs=10000`.
+Yeh, that took a long time to finish with my old GPU and its VRAM.
+For the singing voice model I decided to keep the amount the same, even though we would need `epochs=8334` to complete 25k steps[^3].
+
+[^3]: For $\#\text{samples}=27$ and \$\\text{batch size}=10\$, we need 3 steps to complete 1 epoch: $25000/3\approx8334$
+
+Finally the `eval_interval` can be tweaked to store intermediate results.
+Note that this quantity is in units of *steps* and **not** *epochs*.
+The final models took up around 500 MB of storage each and it will always store the last three (intermediate) models.
+I did not change this value for the current models, but I would think that putting them a little higher to waste less resources on intermediate results is the better move.
+
+::: {.callout-note appearance="simple"}
+## Steps vs Epochs
+
+You might ask: why is the number of steps leading and not (so much) the number of epochs?
+The reason for that is because after every *step*, the parameters are tuned such that the loss function used for training is minimised, **not** after every *epoch*.
+:::
+
 ## Step 3: Inferring audio samples
 
 For inference we first have to separate the vocals from a song, such that we can apply our model on the vocals only.
