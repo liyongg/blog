@@ -84,6 +84,24 @@ pip install -U so-vits-svc-fork
 This will take some time as these libraries are quite large.
 *PyTorch* is a well-known deep learning framework for building and training neural networks.
 
+### Configuring directories
+
+In the directory for this blog post I added two directories: `speaking` and `singing`.
+Both of these directories contain a `dataset_raw` folder, and inside this folder we need a folder which contains the speaker name (`Michel` in this case) and inside this folder the structure does not really matter.
+I chose to add an additional folder `speakingfiles` and `singingfiles` in which the `.wav` audio samples are stored.
+All in all we have the following directory structure before training the data:
+
+``` bash
+.
+├───singing
+│   └───dataset_raw
+│       └───Michel
+│           └───singingfiles
+└───speaking
+    └───dataset_raw
+        └───Michel
+            └───speakingfiles
+```
 
 ## Step 3: Inferring audio samples
 
