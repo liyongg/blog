@@ -70,6 +70,21 @@ Therefore it is perfectly valid to have a non-silent segment for (longer than) 1
 
 ## Step 2: Training the models
 
+### Installing dependencies
+
+It was quite easy following the steps of the GitHub repo.
+As this Quarto blog is already using a `pip` environment, I ran the following code in the VS Code Terminal:
+
+``` {.bash filename="Terminal"}
+source env/Scripts/activate
+pip install -U torch torchaudio
+pip install -U so-vits-svc-fork
+```
+
+This will take some time as these libraries are quite large.
+*PyTorch* is a well-known deep learning framework for building and training neural networks.
+
+
 ## Step 3: Inferring audio samples
 
 For inference we first have to separate the vocals from a song, such that we can apply our model on the vocals only.
