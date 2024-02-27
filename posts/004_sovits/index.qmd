@@ -103,6 +103,37 @@ All in all we have the following directory structure before training the data:
             └───speakingfiles
 ```
 
+### Pre-training
+
+We still need to run a few more commands
+
+``` bash
+svc pre-resample
+svc pre-config
+svc pre-hubert -fm crepe
+```
+
+In `svc pre-resample`, the audio files are transferred from `dataset_raw` to an adjacent folder `dataset`.
+For each audio file in `dataset_raw`, it checks if it
+
+-   meets the minimum audio duration;
+
+-   adjusts the volume of the audio;
+
+-   trims silences from the beginning and end.
+
+In `svc pre-config`, data and configuration files are initialised to train a model.
+Most noticeably it splits the data into training, testing and validation sets.
+It also stores relevant paths to a `config.json` file.
+
+In `svc pre-hubert -fm crepe`, the audio samples are prepared in a way that they can be used for *HuBERT* models.
+HuBERT-based models are designed to understand and interpret spoken language.
+By analyzing many audio samples, they are able to transcribe speech and recognize speakers.
+We will not be going in much further detail.
+The `-fm crepe` option specifies the CREPE (Convolutional Representation for Pitch Estimation) is known to work better for singing inferences.
+Regardless of the pitch estimation method, it is necessary to compute the *fundamental frequency* $f_0$ .
+You can think of it as the (non-unique) lowest tone we hear when a person talks or sings.
+
 ## Step 3: Inferring audio samples
 
 For inference we first have to separate the vocals from a song, such that we can apply our model on the vocals only.
