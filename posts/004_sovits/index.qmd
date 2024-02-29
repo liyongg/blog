@@ -8,16 +8,13 @@ description: "My singing is trash, but hear me out..."
 Let's sing!
 I have seen multiple AI/voice cloned covers of songs on YouTube which made me want to try and create one myself using my own voice.
 After some research I have decided to use the following GitHub repo as a starting point: [voicepaw/so-vits-svc-fork](https://github.com/voicepaw/so-vits-svc-fork).
-Following the ending of Season 2 of the Jujutsu Kaisen anime[^1], I would like to infer the audio of the first opening and final ending of that season:
+Following the ending of Season 2 of the Jujutsu Kaisen anime[^1], I would like to infer the audio of the first opening of that season:
 
 [^1]: Definitely recommended to watch this anime!
 
 {{< video https://www.youtube.com/watch?v=gcgKUcJKxIs >}}
 
-{{< video https://www.youtube.com/watch?v=fR0tqhqM7Yg >}}
-
-I thought it would also be fun to compare between models based on regular speech or singing voice.
-Ultimately we will end up with four inferences: two audio samples with two models give four inferences.
+I thought it would also be fun to compare the result of a model trained on regular speech on one hand and trained on singing on the other.
 We will do so in the following steps:
 
 1.  Preparing the datasets
