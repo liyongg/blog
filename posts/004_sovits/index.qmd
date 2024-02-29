@@ -1,0 +1,306 @@
+---
+title: "Covering anime songs using my own voice!"
+date: "2024-02-14"
+categories: [deep learning, pytorch]
+description: "My singing is trash, but hear me out..."
+---
+
+Let's sing!
+I have seen multiple AI/voice cloned covers of songs on YouTube which made me want to try and create one myself using my own voice.
+After some research I have decided to use the following GitHub repo as a starting point: [voicepaw/so-vits-svc-fork](https://github.com/voicepaw/so-vits-svc-fork).
+Following the ending of Season 2 of the Jujutsu Kaisen anime[^1], I would like to infer the audio of the first opening of that season:
+
+[^1]: Definitely recommended to watch this anime!
+
+{{< video https://www.youtube.com/watch?v=gcgKUcJKxIs >}}
+
+I thought it would also be fun to compare the result of a model trained on regular speech on one hand and trained on singing on the other.
+We will do so in the following steps:
+
+1.  Preparing the datasets
+2.  Training the models
+3.  Inferring audio samples
+
+## Step 1: Preparing the datasets
+
+### Recording my voice
+
+My initial idea was to record my voice using a headset, but after recording some sentences and songs I decided to steer away from the headset and use my mobile phone.
+The audio sounded muff which would definitely also be heard in any audio that I would mix the voice models with.
+For the recordings I used my **OnePlus Open**.
+At the end of the post I will have listed all the specs when training this model.
+
+For a voice model based on *regular speech* I used the [Harvard Sentences](https://www.cs.columbia.edu/~hgs/audio/harvard.html) up until the 10th list.
+I had already done some trial and error on training the model with a local GPU and going past the 10th list would arguably be too much given the scope of this post.
+The regular speech recording duration is approximately 4 minutes and 25 seconds.
+
+For a voice model based on *singing voice* I sang the song [Count on You](https://www.youtube.com/watch?v=BO3q9t52s3I) from Big Time Rush because it recently popped up in my YouTube feed and I felt like it could capture a decent range of my voice[^2].
+The singing voice recording duration is approximately 3 minutes and 13 seconds.
+
+[^2]: I am still an atrocious singer and (hopefully) no one will get their hands on the audio file, but still.
+
+After recording I had connected my phone to my PC and simply copied the `.wav` files to the respective working directories.
+
+::: {.callout-note appearance="simple"}
+## Control and Test
+
+You might wonder: why would you not sing the song that you want to infer for an even better comparison?
+I could have done that, but that would give me more incentive to actually share the control samples which I really prefer not to.
+:::
+
+### Cutting and clipping in Audacity
+
+Now that we have two recordings, we have to cut and clip them in samples with a duration no longer than 10 seconds.
+If we would fail to do so, we will run into *out of memory* (VRAM of GPU) issues when training the model.
+I used the open-source software [Audacity](https://www.audacityteam.org/) in which I imported the audio samples and cut them into multiple samples.
+There are definitely tools out there to perform this exact task online, and one is even included in the code that we will be using.
+However I found the `svc pre-split` command not to give adequate results for my samples, after which I decided to do this manually.
+When you have much more data than I do, I would recommend looking at automated audio-splitter and segmenters.
+For perfectionists it is still wise to check the individual samples for optimal training.
+The following table captures the information of the training data.
+
+|                     | Regular Speech | Singing |
+|---------------------|----------------|---------|
+| $n$ (audio samples) | 101            | 27      |
+| duration (s)        | 1 - 4          | 1 - 10  |
+
+This makes sense: reading sentences sequentially gives more natural pauses which implies more cuts (more samples).
+It also does not take a long time to read a sentence.
+On the other hand: a song is much less predictable when it comes to pauses.
+Therefore it is perfectly valid to have a non-silent segment for (longer than) 10 seconds.
+
+## Step 2: Training the models
+
+### Installing dependencies
+
+It was quite easy following the steps of the GitHub repo.
+As this Quarto blog is already using a `pip` environment, I ran the following code in the VS Code Terminal:
+
+``` {.bash filename="Terminal"}
+source env/Scripts/activate
+pip install -U torch torchaudio
+pip install -U so-vits-svc-fork
+```
+
+This will take some time as these libraries are quite large.
+*PyTorch* is a well-known deep learning framework for building and training neural networks.
+
+### Configuring directories
+
+In the directory for this blog post I added two directories: `speaking` and `singing`.
+Both of these directories contain a `dataset_raw` folder, and inside this folder we need a folder which contains the speaker name (`Michel` in this case) and inside this folder the structure does not really matter.
+I chose to add an additional folder `speakingfiles` and `singingfiles` in which the `.wav` audio samples are stored.
+All in all we have the following directory structure before training the data:
+
+``` bash
+.
+├───singing
+│   └───dataset_raw
+│       └───Michel
+│           └───singingfiles
+└───speaking
+    └───dataset_raw
+        └───Michel
+            └───speakingfiles
+```
+
+### Pre-training
+
+We still need to run a few more commands
+
+``` bash
+svc pre-resample
+svc pre-config
+svc pre-hubert -fm crepe
+```
+
+In `svc pre-resample`, the audio files are transferred from `dataset_raw` to an adjacent folder `dataset`.
+For each audio file in `dataset_raw`, it checks if it
+
+-   meets the minimum audio duration;
+
+-   adjusts the volume of the audio;
+
+-   trims silences from the beginning and end.
+
+In `svc pre-config`, data and configuration files are initialised to train a model.
+Most noticeably it splits the data into training, testing and validation sets.
+It also stores relevant paths to a `config.json` file.
+
+In `svc pre-hubert -fm crepe`, the audio samples are prepared in a way that they can be used for *HuBERT* models.
+HuBERT-based models are designed to understand and interpret spoken language.
+By analyzing many audio samples, they are able to transcribe speech and recognize speakers.
+We will not be going in much further detail.
+The `-fm crepe` option specifies the CREPE (Convolutional Representation for Pitch Estimation) is known to work better for singing inferences.
+Regardless of the pitch estimation method, it is necessary to compute the *fundamental frequency* $f_0$ .
+You can think of it as the (non-unique) lowest tone we hear when a person talks or sings.
+
+### Tweaking config.json
+
+In `./configs/44k/config.json` there are a few settings to tweak before training.
+The most important one to tweak would be the `batch_size`.
+It was set to 20 by default but it did not take into account the VRAM which for the GPU that will be used to train the model.
+I will use my **NVIDIA GTX 1080** which 'only' has 8GB of VRAM.
+As other users have reported to run into out-of-memory issues for a `batch_size=16` with 12GB, I chose to go the safe route and set a `batch_size=10`.
+
+Next would be the amount of steps, which can be indirectly computed by specifying the `epochs`:
+
+$$
+\text{epoch} = \frac{\#\text{samples}}{\text{batch size}}=\# \text{steps}
+$$
+
+For a fixed amount of samples, a larger batch size results in less steps to complete an entire epoch.
+Other users have said to report decent results with no less than 25k steps.
+So for our regular speech model, 101 samples would mean that each epoch needs around 10 steps to complete.
+For 25k steps we would therefore need to train for `epochs=2500`.
+However, I was careless at this stage and kept the regular speech model at `epochs=10000`.
+Yeh, that took a long time to finish with my old GPU and its VRAM.
+For the singing voice model I decided to keep the amount the same, even though we would need `epochs=8334` to complete 25k steps[^3].
+
+[^3]: For $\#\text{samples}=27$ and $\text{batch size}=10$, we need 3 steps to complete 1 epoch: $25000/3\approx8334$
+
+Finally the `eval_interval` can be tweaked to store intermediate results.
+Note that this quantity is in units of *steps* and **not** *epochs*.
+The final models took up around 500 MB of storage each and it will always store the last three (intermediate) models.
+I did not change this value for the current models, but I would think that putting them a little higher to waste less resources on intermediate results is the better move.
+
+::: {.callout-note appearance="simple"}
+## Steps vs Epochs
+
+You might ask: why is the number of steps leading and not (so much) the number of epochs?
+The reason for that is because after every *step*, the parameters are tuned such that the loss function used for training is minimised, **not** after every *epoch*.
+:::
+
+### Training
+
+To start training a model we simply run:
+
+``` {.bash filename="Terminal"}
+svc train -t
+```
+
+The `-t` option also starts a local web server with *TensorBoard*.
+It provides measurements and visualisations that can be useful when training a machine learning model.
+But to be honest I have not looked into this for this post because of the total computing time.
+The regular speech model trained for nearly 24 hours.
+The singing voice model took even longer than that to complete its training, but that is probably caused by me not fully dedicating the PC and all of its GPU resources to the training.
+
+## Step 3: Inferring audio samples
+
+### Obtaining audio recording
+
+Now that our models have been trained we can almost start inferring.
+In order to do so we at least need an audio file in `.wav` format of the vocals which we want to replace our voice with.
+A great open-source tool called [Ultimate Vocal Remover](https://github.com/Anjok07/ultimatevocalremovergui) (UVR) serves exactly this purpose.
+There are no other dependencies if we convert the provided audio/video file to a `.wav` file.
+For non-`.wav` files we need to install [FFmpeg](https://ffmpeg.org/).
+
+The audio we need is in YouTube videos and we can download the relevant videos to serve UVR with.
+We use the [yt-dlp](https://github.com/yt-dlp/yt-dlp)[^4] package for that which can be downloaded with the `pip` installer as well.
+
+[^4]: I had some issues with the [youtube-dl](https://github.com/ytdl-org/youtube-dl) package for some videos.
+
+``` {.bash filename="Terminal"}
+pip install yt-dlp
+```
+
+After installing we can download the relevant videos as such:
+
+``` {.bash filename="Terminal"}
+yt-dlp <YouTube-link>
+```
+
+I have tried using UVR to separate the vocals for the video linked at the start of this post, but I did not find the resulting vocals clear enough for the inference to sound good throughout.
+It would be possible to spend even more time than I have already invested into getting a clear audio for the anime versions of the song, but I decided to take an easier route this time.
+Another version of this song was recorded on the YouTube channel **THE FIRST TAKE** and it is much easier to separate the vocals from this recording as the background music is not as immersed.
+
+{{< video https://youtu.be/i0K40f-6mLs?si=MXBJF7Z6iHBCpf8V&t=29 >}}
+
+### Extract vocals from recording
+
+Open up UVR and select the `.mp4` which was downloaded using `yt-dlp`.
+There are many models that can be used within UVR and they serve different purposes.
+For our scope we can simply go with the default `UVR-MDX-NET Inst HQ 3` that came with the installation.
+To avoid copyright issues it is sufficient to select the *Vocals Only* option.
+I would recommend using *GPU Conversion* as it can take quite some time for some files.
+Click on *Start Processing* and wait for the resulting `.wav` file.
+
+![Interface of Ultimate Vocal Remover](uvr.png)
+
+### Infer with `svcg`
+
+Finally we can start inferring!
+
+``` {.bash filename="Terminal"}
+svcg
+```
+
+The graphical interface should now open.
+
+![Graphical interface of SVC inference](svcg.png)
+
+1.  Select the paths to the model and its corresponding config file.
+    As we have two models it is important to select the correct pairs of paths.
+
+2.  Specify the path to the `.wav` audio file that we extracted using UVR.
+
+3.  Turn off *Auto play*.
+
+4.  Adjust the *Silence threshold* if necessary.
+    A lower (left) value results in the inference picking up more sounds.
+    A higher (right) value results in the inference picking up louder sounds in the audio sample.
+
+5.  Adjust the *Pitch* if necessary.
+    This can come in handy if the pitch in the audio file is substantially different from the trained model.
+
+6.  Turn off *Auto predict F0*.
+
+7.  Choose `crepe` as the *F0 prediction method*.
+
+8.  Click on *Infer*.
+
+::: {.callout-important appearance="minimal"}
+## Buggy interface for so-vits-svc-fork v4.1.51
+
+For some reason the very first inference ends up using other settings than specified.
+Be aware of this and perform the inference at least once more with the exact same settings.
+It should also be fine to not change any of the settings for the first 'dummy' inference, and only change it after the first inference has completed.
+This behaviour seems to reset for every new call of `svcg` in the Terminal.
+:::
+
+## TL;DR
+
+### Original {.unlisted}
+
+```{=html}
+<iframe width="560" height="315" src="https://www.youtube.com/embed/i0K40f-6mLs?si=rKLswrh1LPbYXAC0&amp;start=29" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+```
+
+::: columns
+::: column
+### Singing Model
+
+```{=html}
+<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1760460876&color=%23ffffff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/li-yong-pan" title="Li Yong Pan" target="_blank" style="color: #cccccc; text-decoration: none;">Li Yong Pan</a> · <a href="https://soundcloud.com/li-yong-pan/ao-no-sumika-li-yong-pan-speaking" title="Ao no Sumika - Li Yong Pan (Singing)" target="_blank" style="color: #cccccc; text-decoration: none;">Ao no Sumika - Li Yong Pan (Singing)</a></div>
+```
+:::
+
+::: column
+### Speaking Model
+
+```{=html}
+<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1760461329&color=%23ffffff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/li-yong-pan" title="Li Yong Pan" target="_blank" style="color: #cccccc; text-decoration: none;">Li Yong Pan</a> · <a href="https://soundcloud.com/li-yong-pan/ao-no-sumika-li-yong-pan-singing" title="Ao no Sumika - Li Yong Pan (Speaking)" target="_blank" style="color: #cccccc; text-decoration: none;">Ao no Sumika - Li Yong Pan (Speaking)</a></div>
+```
+:::
+:::
+
+------------------------------------------------------------------------
+
+I think it is quite clear from the audio samples that the model that was trained on singing data has a much better output.
+Not all highs are inferred perfectly, but compared to the regular speech model it sounds better in pretty much every aspect.
+The regular speech model also seems to have trouble with pronunciation of words as it finished words with a 'ur' a lot.
+Keep in mind that these two inferences were made with the exact same settings.
+The regular speech model could perform better on rap music or on audio samples for which the range is not as wide.
+It should also perform better on regular text-to-speech (TTS) commands, but we will save that for a future post or project.
+
+That’s all for today, thanks for reading!
