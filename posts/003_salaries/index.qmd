@@ -335,7 +335,7 @@ Are the values in the `tax_rate` column indeed non-decreasing?
 
 :::
 
-## Step 4:
+## Step 4: Training the model
 
 Let's train a model in which the gross salary is the dependent variable, and the net salary is the independent variable.
 We want to train a model which can completely capture the relationship, meaning it has a *mean squared error* of 0.
