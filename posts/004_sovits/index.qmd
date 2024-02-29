@@ -225,3 +225,46 @@ I would recommend using *GPU Conversion* as it can take quite some time for some
 Click on *Start Processing* and wait for the resulting `.wav` file.
 
 ![Interface of Ultimate Vocal Remover](uvr.png)
+
+### Infer with `svcg`
+
+Finally we can start inferring!
+
+``` {.bash filename="Terminal"}
+svcg
+```
+
+The graphical interface should now open.
+
+![Graphical interface of SVC inference](svcg.png)
+
+1.  Select the paths to the model and its corresponding config file.
+    As we have two models it is important to select the correct pairs of paths.
+
+2.  Specify the path to the `.wav` audio file that we extracted using UVR.
+
+3.  Turn off *Auto play*.
+
+4.  Adjust the *Silence threshold* if necessary.
+    A lower (left) value results in the inference picking up more sounds.
+    A higher (right) value results in the inference picking up louder sounds in the audio sample.
+
+5.  Adjust the *Pitch* if necessary.
+    This can come in handy if the pitch in the audio file is substantially different from the trained model.
+
+6.  Turn off *Auto predict F0*.
+
+7.  Choose `crepe` as the *F0 prediction method*.
+
+8.  Click on *Infer*.
+
+::: {.callout-important appearance="minimal"}
+## Buggy interface for so-vits-svc-fork v4.1.51
+
+For some reason the very first inference ends up using other settings than specified.
+Be aware of this and perform the inference at least once more with the exact same settings.
+It should also be fine to not change any of the settings for the first 'dummy' inference, and only change it after the first inference has completed.
+This behaviour seems to reset for every new call of `svcg` in the Terminal.
+:::
+:::
+:::
