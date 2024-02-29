@@ -186,4 +186,31 @@ The singing voice model took even longer than that to complete its training, but
 
 ## Step 3: Inferring audio samples
 
-For inference we first have to separate the vocals from a song, such that we can apply our model on the vocals only.
+### Obtaining audio recording
+
+Now that our models have been trained we can almost start inferring.
+In order to do so we at least need an audio file in `.wav` format of the vocals which we want to replace our voice with.
+A great open-source tool called [Ultimate Vocal Remover](https://github.com/Anjok07/ultimatevocalremovergui) (UVR) serves exactly this purpose.
+There are no other dependencies if we convert the provided audio/video file to a `.wav` file.
+For non-`.wav` files we need to install [FFmpeg](https://ffmpeg.org/).
+
+The audio we need is in YouTube videos and we can download the relevant videos to serve UVR with.
+We use the [yt-dlp](https://github.com/yt-dlp/yt-dlp)[^4] package for that which can be downloaded with the `pip` installer as well.
+
+[^4]: I had some issues with the [youtube-dl](https://github.com/ytdl-org/youtube-dl) package for some videos.
+
+``` {.bash filename="Terminal"}
+pip install yt-dlp
+```
+
+After installing we can download the relevant videos as such:
+
+``` {.bash filename="Terminal"}
+yt-dlp <YouTube-link>
+```
+
+I have tried using UVR to separate the vocals for the video linked at the start of this post, but I did not find the resulting vocals clear enough for the inference to sound good throughout.
+It would be possible to spend even more time than I have already invested into getting a clear audio for the anime versions of the song, but I decided to take an easier route this time.
+Another version of this song was recorded on the YouTube channel **THE FIRST TAKE** and it is much easier to separate the vocals from this recording as the background music is not as immersed.
+
+{{< video https://youtu.be/i0K40f-6mLs?si=MXBJF7Z6iHBCpf8V&t=29 >}}
