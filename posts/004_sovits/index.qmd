@@ -1,6 +1,7 @@
 ---
 title: "Covering anime songs using my own voice!"
-date: "2024-02-14"
+date: "2024-02-28"
+date-modified: "2024-02-29"
 categories: [deep learning, pytorch]
 description: "My singing is trash, but hear me out..."
 ---
@@ -270,18 +271,24 @@ This behaviour seems to reset for every new call of `svcg` in the Terminal.
 
 ## TL;DR
 
+::: {.callout-caution collapse="true" appearance="minimal"}
+## Static on Firefox 123.0 (Android only (?))
+
+After the post I noticed that playing the audio samples from SoundCloud contained white noise.
+This did not occur the Chrome browser on a phone.
+:::
+
 ### Original {.unlisted}
 
 ```{=html}
 <iframe width="560" height="315" src="https://www.youtube.com/embed/i0K40f-6mLs?si=rKLswrh1LPbYXAC0&amp;start=29" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 ```
-
 ::: columns
 ::: column
 ### Singing Model
 
 ```{=html}
-<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1760460876&color=%23ffffff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/li-yong-pan" title="Li Yong Pan" target="_blank" style="color: #cccccc; text-decoration: none;">Li Yong Pan</a> · <a href="https://soundcloud.com/li-yong-pan/ao-no-sumika-li-yong-pan-speaking" title="Ao no Sumika - Li Yong Pan (Singing)" target="_blank" style="color: #cccccc; text-decoration: none;">Ao no Sumika - Li Yong Pan (Singing)</a></div>
+<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1760460876&color=%23ffffff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
 ```
 :::
 
@@ -289,7 +296,7 @@ This behaviour seems to reset for every new call of `svcg` in the Terminal.
 ### Speaking Model
 
 ```{=html}
-<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1760461329&color=%23ffffff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/li-yong-pan" title="Li Yong Pan" target="_blank" style="color: #cccccc; text-decoration: none;">Li Yong Pan</a> · <a href="https://soundcloud.com/li-yong-pan/ao-no-sumika-li-yong-pan-singing" title="Ao no Sumika - Li Yong Pan (Speaking)" target="_blank" style="color: #cccccc; text-decoration: none;">Ao no Sumika - Li Yong Pan (Speaking)</a></div>
+<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1760461329&color=%23ffffff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
 ```
 :::
 :::
