@@ -170,6 +170,20 @@ You might ask: why is the number of steps leading and not (so much) the number o
 The reason for that is because after every *step*, the parameters are tuned such that the loss function used for training is minimised, **not** after every *epoch*.
 :::
 
+### Training
+
+To start training a model we simply run:
+
+``` {.bash filename="Terminal"}
+svc train -t
+```
+
+The `-t` option also starts a local web server with *TensorBoard*.
+It provides measurements and visualisations that can be useful when training a machine learning model.
+But to be honest I have not looked into this for this post because of the total computing time.
+The regular speech model trained for nearly 24 hours.
+The singing voice model took even longer than that to complete its training, but that is probably caused by me not fully dedicating the PC and all of its GPU resources to the training.
+
 ## Step 3: Inferring audio samples
 
 For inference we first have to separate the vocals from a song, such that we can apply our model on the vocals only.
