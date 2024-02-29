@@ -214,3 +214,14 @@ It would be possible to spend even more time than I have already invested into g
 Another version of this song was recorded on the YouTube channel **THE FIRST TAKE** and it is much easier to separate the vocals from this recording as the background music is not as immersed.
 
 {{< video https://youtu.be/i0K40f-6mLs?si=MXBJF7Z6iHBCpf8V&t=29 >}}
+
+### Extract vocals from recording
+
+Open up UVR and select the `.mp4` which was downloaded using `yt-dlp`.
+There are many models that can be used within UVR and they serve different purposes.
+For our scope we can simply go with the default `UVR-MDX-NET Inst HQ 3` that came with the installation.
+To avoid copyright issues it is sufficient to select the *Vocals Only* option.
+I would recommend using *GPU Conversion* as it can take quite some time for some files.
+Click on *Start Processing* and wait for the resulting `.wav` file.
+
+![Interface of Ultimate Vocal Remover](uvr.png)
