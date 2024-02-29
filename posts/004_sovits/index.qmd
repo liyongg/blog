@@ -266,5 +266,40 @@ Be aware of this and perform the inference at least once more with the exact sam
 It should also be fine to not change any of the settings for the first 'dummy' inference, and only change it after the first inference has completed.
 This behaviour seems to reset for every new call of `svcg` in the Terminal.
 :::
+
+## TL;DR
+
+### Original {.unlisted}
+
+```{=html}
+<iframe width="560" height="315" src="https://www.youtube.com/embed/i0K40f-6mLs?si=rKLswrh1LPbYXAC0&amp;start=29" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+```
+
+::: columns
+::: column
+### Singing Model
+
+```{=html}
+<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1760460876&color=%23ffffff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/li-yong-pan" title="Li Yong Pan" target="_blank" style="color: #cccccc; text-decoration: none;">Li Yong Pan</a> · <a href="https://soundcloud.com/li-yong-pan/ao-no-sumika-li-yong-pan-speaking" title="Ao no Sumika - Li Yong Pan (Singing)" target="_blank" style="color: #cccccc; text-decoration: none;">Ao no Sumika - Li Yong Pan (Singing)</a></div>
+```
+:::
+
+::: column
+### Speaking Model
+
+```{=html}
+<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1760461329&color=%23ffffff&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/li-yong-pan" title="Li Yong Pan" target="_blank" style="color: #cccccc; text-decoration: none;">Li Yong Pan</a> · <a href="https://soundcloud.com/li-yong-pan/ao-no-sumika-li-yong-pan-singing" title="Ao no Sumika - Li Yong Pan (Speaking)" target="_blank" style="color: #cccccc; text-decoration: none;">Ao no Sumika - Li Yong Pan (Speaking)</a></div>
+```
 :::
 :::
+
+------------------------------------------------------------------------
+
+I think it is quite clear from the audio samples that the model that was trained on singing data has a much better output.
+Not all highs are inferred perfectly, but compared to the regular speech model it sounds better in pretty much every aspect.
+The regular speech model also seems to have trouble with pronunciation of words as it finished words with a 'ur' a lot.
+Keep in mind that these two inferences were made with the exact same settings.
+The regular speech model could perform better on rap music or on audio samples for which the range is not as wide.
+It should also perform better on regular text-to-speech (TTS) commands, but we will save that for a future post or project.
+
+That’s all for today, thanks for reading!
