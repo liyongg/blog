@@ -1,8 +1,8 @@
 ---
 title: "Covering anime songs using my own voice!"
 date: "2024-02-14"
-categories: [machine learning, pytorch]
-description: "My singing is not good, but hear me out..."
+categories: [deep learning, pytorch]
+description: "My singing is trash, but hear me out..."
 ---
 
 Let's sing!
