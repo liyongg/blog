@@ -25,8 +25,9 @@ We will do so in the following steps:
 
 ### Recording my voice
 
-My initial idea was to record voice using a headset, but after recording some sentences and songs I decided to steer away from the headset and use my mobile phone.
-For the recordings, I used my **OnePlus Open**.
+My initial idea was to record my voice using a headset, but after recording some sentences and songs I decided to steer away from the headset and use my mobile phone.
+The audio sounded muff which would definitely also be heard in any audio that I would mix the voice models with.
+For the recordings I used my **OnePlus Open**.
 At the end of the post I will have listed all the specs when training this model.
 
 For a voice model based on *regular speech* I used the [Harvard Sentences](https://www.cs.columbia.edu/~hgs/audio/harvard.html) up until the 10th list.
@@ -38,12 +39,12 @@ The singing voice recording duration is approximately 3 minutes and 13 seconds.
 
 [^2]: I am still an atrocious singer and (hopefully) no one will get their hands on the audio file, but still.
 
-After recording I had connected my phone to my PC and simply copied the `.wav` files to the working directory.
+After recording I had connected my phone to my PC and simply copied the `.wav` files to the respective working directories.
 
 ::: {.callout-note appearance="simple"}
 ## Control and Test
 
-You might wonder: why would you not sing the songs that are meant to be inferred for an even better comparison?
+You might wonder: why would you not sing the song that you want to infer for an even better comparison?
 I could have done that, but that would give me more incentive to actually share the control samples which I really prefer not to.
 :::
 
@@ -54,11 +55,14 @@ If we would fail to do so, we will run into *out of memory* (VRAM of GPU) issues
 I used the open-source software [Audacity](https://www.audacityteam.org/) in which I imported the audio samples and cut them into multiple samples.
 There are definitely tools out there to perform this exact task online, and one is even included in the code that we will be using.
 However I found the `svc pre-split` command not to give adequate results for my samples, after which I decided to do this manually.
-In a more serious setting or when you have much more data than I do, I would recommend looking at automated audio-splitter and segmenters.
+When you have much more data than I do, I would recommend looking at automated audio-splitter and segmenters.
+For perfectionists it is still wise to check the individual samples for optimal training.
+The following table captures the information of the training data.
 
-For the regular speech model we ended up with 101 samples with durations varying from 1 to 4 seconds.
-
-For the singing voice model we ended up with 27 samples with durations varying from 1 to 10 seconds.
+|                     | Regular Speech | Singing |
+|---------------------|----------------|---------|
+| $n$ (audio samples) | 101            | 27      |
+| duration (s)        | 1 - 4          | 1 - 10  |
 
 This makes sense: reading sentences sequentially gives more natural pauses which implies more cuts (more samples).
 It also does not take a long time to read a sentence.
@@ -153,7 +157,7 @@ However, I was careless at this stage and kept the regular speech model at `epoc
 Yeh, that took a long time to finish with my old GPU and its VRAM.
 For the singing voice model I decided to keep the amount the same, even though we would need `epochs=8334` to complete 25k steps[^3].
 
-[^3]: For $\#\text{samples}=27$ and \$\\text{batch size}=10\$, we need 3 steps to complete 1 epoch: $25000/3\approx8334$
+[^3]: For $\#\text{samples}=27$ and $\text{batch size}=10$, we need 3 steps to complete 1 epoch: $25000/3\approx8334$
 
 Finally the `eval_interval` can be tweaked to store intermediate results.
 Note that this quantity is in units of *steps* and **not** *epochs*.
