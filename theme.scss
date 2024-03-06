@@ -1,7 +1,12 @@
 /*-- scss:variables --*/
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
 
 $color-linkedin: #0a66c2;
 $color-github: #24292f;
+
+$font-family-sans-serif: "Source Sans 3";
+$font-family-monospace: "Jetbrains Mono";
 
 /*-- scss:rules --*/
 
