@@ -12,6 +12,9 @@ about:
       text: GitHub
       href: https://github.com/liyongg
       target: _blank
+    - icon: journal-code
+      text: Blog Posts
+      href: blog.qmd
 comments: false
 ---
 
