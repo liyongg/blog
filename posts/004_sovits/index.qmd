@@ -274,8 +274,9 @@ This behaviour seems to reset for every new call of `svcg` in the Terminal.
 ::: {.callout-caution collapse="true" appearance="minimal"}
 ## Static on Firefox 123.0 (Android only (?))
 
-After the post I noticed that playing the audio samples from SoundCloud contained white noise.
-This did not occur the Chrome browser on a phone.
+After the post I noticed that playing the audio samples using an Android phone contained white noise on FireFox.
+This did not occur while using the Chrome browser on a phone.
+For a more pleasant listening experience I would recommend to **not** use the FireFox browser.
 :::
 
 ### Original {.unlisted}
