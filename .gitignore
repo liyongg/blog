@@ -1,3 +1,5 @@
 /.quarto/
 /_site/
 /env/
+**/.idea
+**/__pycache__
