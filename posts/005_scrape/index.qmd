@@ -4,6 +4,7 @@ date: "2024-04-03"
 categories: [text mining, deep learning, pytorch]
 description: '"使用大语言模型翻译PDF内容"'
 code-fold: false
+image: hugging-pdf.svg
 ---
 
 I have an extremely interesting and ambitious project that I am working on where I use React Native for the front end, and FastAPI as the backend.
