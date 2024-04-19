@@ -21,6 +21,9 @@ if __name__ == '__main__':
         .replace(regex=r'\((de|het)\)', value='') \
         .str.strip()
     
+    df[df["Words_trimmed"] != df["Words"]]
+    df[df["Meanings_trimmed"] != df["Meanings_trimmed"]]
+    
     words = df["Words_trimmed"].tolist()
     meanings = df["Meanings_trimmed"].tolist()
     

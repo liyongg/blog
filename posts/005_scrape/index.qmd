@@ -54,7 +54,7 @@ One naive way would be to define
 3.  the remaining words to be the corresponding meaning.
 
 But this sucks.
-To see that, let's first split the lines for this very long string and show the first 10 results.
+To visualise that, let's first split the lines for this very long string and show the first 10 results.
 
 ```{python}
 lines = text_first_page.splitlines()[:9]
@@ -98,7 +98,10 @@ Let's set up this pipeline.
 ## Step 4: Set up a processing pipeline
 
 Below is the `VocabExtractor.py` file containing all the necessary steps to create a Pandas DataFrame containing the entire vocabulary list.
-The code should be self-explanatory, but we will highlight and explain some bits.
+The code should be self-explanatory, but we will highlight and explain some bits[^1].
+
+[^1]: You might wonder: "Did you really need to write this as a class? It contains pretty much only methods that could be used statically.", and I wouldn't blame you.
+    However I just wanted a quick way to provide a better overview of all the code, and this was my best excuse for it.
 
 ```{python filename="VocabExtractor.py"}
 import pandas as pd
@@ -157,9 +160,9 @@ class VocabExtractor:
 
 1.  Initialise a list of which its only element is the first line of extracted text from the page. Then loop over the pairs of subsequent item pairs and check if the second element of the pair starts with a digit. If it does, then there is no overflow and the succeeding element is a valid new line of text which we append to the initial list. If it does not, then it means the line was overflown and we add this newline to the final element of the initial list.
 2.  For each line, extract the substring starting from the first 'word' following the first whitespace character. Effectively it removes the first word from each line, which should really be the index of the line.
-3.  Combine all methods defined above and loop through the pages to create a dataframe for each page. Finally concatenate all these dataframes and filter the lines which contain the 'word' "Derde Ronde Nederlands voor buitenlanders", as it is noise from the footer that appear on every even page.[^1]
+3.  Combine all methods defined above and loop through the pages to create a dataframe for each page. Finally concatenate all these dataframes and filter the lines which contain the 'word' "Derde Ronde Nederlands voor buitenlanders", as it is noise from the footer that appear on every even page.[^2]
 
-[^1]: It would also have been possible to crop the page before extracting the text, but to me it seemed like more work experimenting with the dimensions.
+[^2]: It would also have been possible to crop the page before extracting the text, but to me it seemed like more work experimenting with the dimensions.
 
 Now we can run the following code:
 
@@ -192,8 +195,27 @@ df["Meanings_trimmed"] = df["Meanings"] \
     .replace(regex=r';\s*[\w\s]+-[\w\s]+-[\w\s]+', value='') \
     .replace(regex=r'\((de|het)\)', value='') \
     .str.strip()
-df
 ```
+
+::: {.panel-tabset}
+
+## Words
+
+```{python}
+df[df["Words_trimmed"] != df["Words"]]
+```
+
+All articles are gone in the `Words_trimmed` column, great!
+
+## Meanings
+
+```{python}
+df[df["Meanings_trimmed"] != df["Meanings"]]
+```
+
+All conjugations are gone in the `Meanings_trimmed` column, great!
+
+:::
 
 Alright!
 Let's make lists of these words and their meanings to serve as input for an LLM.
@@ -240,9 +262,9 @@ title = translate("Translating PDF content using a Large Language Model", src_la
 title["translation"][0]["translation_text"]
 ```
 
-Looks decent[^2] to me!
+Looks decent[^3] to me!
 
-[^2]: Other translators could return "大型语言" instead of "大语言" and the former is indeed more accurate.
+[^3]: Other translators could return "大型语言" instead of "大语言" and the former is indeed more accurate.
 
 ## Step 7: Translating a batch of words
 
@@ -270,7 +292,7 @@ pd.read_csv("vocab.csv", sep=";")
 
 Download the [vocab.csv](vocab.csv) if you are interested or would like to work with this dataset!
 
-## Step 8: Evaluating the results
+## TL;DR
 
 My Mandarin is nowhere near native level, but when quickly skimming the dataset it is evident that the direct translation of some words are not correct.
 It uses the character 子 in those occasions, which has various meaning and uses in different contexts.
@@ -278,6 +300,6 @@ Also, the meanings are sometimes oddly translated, as for some words the corresp
 
 In general, the direct translations of the words could serve as a potential starting point for my upcoming project.
 However, a better starting point would probably to find a Dutch-Chinese vocabulary list.
-An LLM could then be used to explain the words.
+An LLM could then be used to explain the words, or find sample sentences to include.
 
 That's all for today, thanks for reading!
