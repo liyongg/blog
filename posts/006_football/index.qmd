@@ -744,14 +744,12 @@ If everything is correctly set up the app should be accessible through [football
 
 It appears that the app is not loading on the Apache web server due to websocket errors and some API changes.
 I'll be looking for a fix...
-For the time being we can use [football-positions.streamlit.app](https://football-positions.streamlit.app/)
 :::
 
 ## TL;DR
 
 It's not as difficult as it sounds to prepare a model for deployment.
 Due to unforeseen changes in the `streamlit==1.33` package, the app did not load due to websocket erros.
-The app is currently hosted on [football-positions.streamlit.app](https://football-positions.streamlit.app/).
 We will be looking back on this soon!
 
 That's all for today, thanks for reading!
