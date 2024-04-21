@@ -19,3 +19,6 @@ code-tools: true
 code-block-bg: 'black'
 code-block-border-left: 'white'
 highlight-style: atom-one-dark
+
+# Lightbox
+lightbox: true
