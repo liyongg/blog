@@ -345,7 +345,7 @@ train, test = df.select(cols).randomSplit([0.7, 0.3], seed=10)
 :::
 
 | Column     | Description                                                                         |
-|----------------------|--------------------------------------------------|
+|-----------------------|-------------------------------------------------|
 | Shots      | Shots total (Does not include penalty kicks) per 90 minutes                         |
 | PassMedAtt | Passes attempted (Passes between 15 and 30 yards) per 90 minutes                    |
 | Pas3rd     | Completed passes that enter the 1/3 of the pitch closest to the goal per 90 minutes |
