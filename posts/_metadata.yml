@@ -22,3 +22,6 @@ highlight-style: atom-one-dark
 
 # Lightbox
 lightbox: true
+
+# Links
+link-external-newwindow: true
