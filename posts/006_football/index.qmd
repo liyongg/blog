@@ -345,7 +345,7 @@ train, test = df.select(cols).randomSplit([0.7, 0.3], seed=10)
 :::
 
 | Column     | Description                                                                         |
-|----------------------|--------------------------------------------------|
+|-------------------------|-----------------------------------------------|
 | Shots      | Shots total (Does not include penalty kicks) per 90 minutes                         |
 | PassMedAtt | Passes attempted (Passes between 15 and 30 yards) per 90 minutes                    |
 | Pas3rd     | Completed passes that enter the 1/3 of the pitch closest to the goal per 90 minutes |
@@ -744,6 +744,8 @@ If everything is correctly set up the app should be accessible through [football
 
 It appears that the app is not loading on the Apache web server due to websocket errors and some API changes.
 I'll be looking for a fix...
+
+(2024-04-22): The app is hosted on [football-positions.streamlit.app](https://football-positions.streamlit.app/) for the time being!
 :::
 
 ## TL;DR
@@ -751,5 +753,9 @@ I'll be looking for a fix...
 It's not as difficult as it sounds to prepare a model for deployment.
 Due to unforeseen changes in the `streamlit==1.33` package, the app did not load due to websocket erros.
 We will be looking back on this soon!
+
+::: callout-caution
+**EDIT (2024-04-22):** The app is hosted on [football-positions.streamlit.app](https://football-positions.streamlit.app/) for the time being!
+:::
 
 That's all for today, thanks for reading!
