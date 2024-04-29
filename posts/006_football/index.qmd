@@ -708,6 +708,13 @@ We need to add a virtual host `football-positions.conf` and enable it.
     ProxyPass / http://localhost:8501/
     ProxyPassReverse / http://localhost:8501/
 
+    # This was the fix mentioned below!
+    <Location "/_stcore/stream">
+        ProxyPass               ws://localhost:8501/_stcore/stream
+        ProxyPassReverse        ws://localhost:8501/_stcore/stream
+    </Location>
+
+
     # ...
 </VirtualHost>
 
@@ -746,6 +753,8 @@ It appears that the app is not loading on the Apache web server due to websocket
 I'll be looking for a fix...
 
 **(2024-04-22):** The app is hosted on [football-positions.streamlit.app](https://football-positions.streamlit.app/) for the time being!
+
+**(2024-04-29):** I have found the fix! The app is hosted on [football-positions.panliyong.nl](https://football-positions.panliyong.nl/)!
 :::
 
 ## TL;DR
@@ -756,6 +765,8 @@ We will be looking back on this soon!
 
 ::: {.callout-caution appearance="simple"}
 **(2024-04-22):** The app is hosted on [football-positions.streamlit.app](https://football-positions.streamlit.app/) for the time being!
+
+**(2024-04-29):** I have found the fix! The app is hosted on [football-positions.panliyong.nl](https://football-positions.panliyong.nl/)!
 :::
 
 That's all for today, thanks for reading!
