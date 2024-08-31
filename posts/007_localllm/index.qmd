@@ -1,0 +1,179 @@
+---
+title: "Hosting an LLM using my old PC: part 1"
+date: "2024-08-28"
+categories: [large language model, hardware]
+description: "Local LLMs?"
+---
+
+I promised to reward myself with a new PC once I started with a new job.
+As of August 1st I started a position at [Nationale-Nederlanden](https://www.nn.nl/) and found myself wondering what to do with my older PC hardware.
+It consists of:
+
+-   GPU: [MSI GeForce GTX 1080 GAMING X 8G](https://tweakers.net/pricewatch/545523/msi-geforce-gtx-1080-gaming-x-8g/specificaties/)
+-   CPU: [AMD Ryzen 5 3600X](https://tweakers.net/pricewatch/1390254/amd-ryzen-5-3600x-boxed/specificaties/)
+-   RAM: [2x 8GB Corsair Vengeance LPX 32000](link)
+
+And of course some other components, but as long as the power supply is sufficient, the others are irrelevant.
+For other projects and with the state of AI, I would like to convert it to a machine which hosts a Large Language Model and serve it with an API.
+
+Today I will be going through the steps of this conversion, and specifically we will look at the installation of Debian, installing NVIDIA drivers, and checking if the old hardware can handle LLaMA 3.1 with 7B tokens.
+
+## Step 1: Creating a bootable media installation
+
+Debian distributions are free to download, and can be found on [debian.org](debian.org).
+I am choosing to install Debian via internet connection.
+Because we are using a 64-bit processor with AMD64 architecture, we select the `amd64` option under the *Small CDs or USB sticks* section, and the download of approximately 650 MB of the file `debian-12.6.0-amd64-netinst.iso` should start.
+
+After installing an image of Debian we need software to flash the image to a USB drive.
+[balenaEtcher](https://etcher.balena.io/#download-etcher) is the tool we will use and I have pretty good experiences with it, as I used it for DietPi and EndeavourOS.
+Select the image, the USB drive and you can flash it to the drive.
+Easy as that!
+
+## Step 2: Installing Debian
+
+My old PC was running Windows 10 Home and had three drives mounted on it.
+Needless to say I had backed up all my files on my NAS before wiping or partitioning any drive.
+If all of this works out the way it should then I am planning to move to a smaller ITX case so that I can place the server in my living room.
+To accommodate for the smalle case I chose to install the new OS on my M.2 drive, because that will surely be transferred to the new rig.
+
+I plugged in the USB with an image of Debian and just mashed ESC, DEL, and F12 because who can even read the text on the boot screen?
+Select the USB drive as the first boot option, and simply choose the correct install options.
+Do make sure to include an SSH server and a web server, just for convenience.
+I also installed the *xfce* desktop environment because it is lightweight and I wanted to make sure to check if the installation went correctly.
+Smooth sailing!
+
+## Step 3: Installing NVIDIA drivers
+
+The boot was succesful and there are a few things remaining before we are ready to use the GPU.
+As the user account we used to log in is new, we have to add them to de `sudo` group.
+
+```{.bash filename=Terminal}
+sudo adduser <username> sudo
+```
+
+When rebooting or at the next login with the user, the changes should be active.
+Now open `/etc/apt/sources.list` such that it contains the following line:
+
+```{.bash filename=Terminal}
+deb http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmware
+```
+
+In particular, check if `contrib`, `non-free`, and `non-free-firmware` are included.
+Then I would recommend installing the small `nvidia-detect` package:
+
+```{.bash filename=Terminal}
+sudo apt install nvidia-detect
+nvidia-detect
+```
+
+It should show which NVIDIA drivers are supported for the NVIDIA GPU at use.
+But before installing those drivers, it is necessary according to the [Debian wiki](https://wiki.debian.org/NvidiaGraphicsDrivers#nvidia-detect) to install proper kernal headers.
+As we are using a 64-bit system, we can run:
+
+```{.bash filename=Terminal}
+sudo apt install linux-headers-amd64
+```
+
+Finally, we can install the NVIDIA drivers:
+
+```{.bash filename=Terminal}
+sudo apt install nvidia-driver firmware-misc-nonfree
+```
+
+After restarting the firmware, everything should work accordingly (and it did)!
+
+## Step 4: Hello LLM
+
+Now on to some testing, finally!
+For our Debian OS we can install it using the following command:
+
+```{.bash filename=Terminal}
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+To test this, we can run 
+
+```{.bash filename=Terminal}
+ollama pull llama3.1
+```
+
+If you are paranoid and want more confirmation, you can run
+
+```{.bash filename=Terminal}
+ollama list
+```
+
+which should show the model that was just pulled.
+The command for running the model is easy!
+
+```{.bash filename=Terminal}
+ollama run llama3.1
+```
+
+Let's now try some prompts:
+
+```{.bash filename=Terminal}
+>>> What are you?
+# I’m a large language model. When you ask me a question or provide me with
+# a prompt, I analyze what you say and generate a response that is relevant
+# and accurate. I'm constantly learning and improving, so over time I'll be
+# even better at assisting you. Is there anything I can help you with?
+```
+
+```{.bash filename=Terminal}
+>>> Can you think of some fun small tech projects to post on a blog
+... that involve a Large Language Model?
+# Here are some fun small tech project ideas that involve a
+# Large Language Model (LLM) like me:
+
+# 1. **Poetry Generator**: Create a simple web app that
+#generates a poem based on a user's input, such as a theme or
+#emotions they want to express.
+# 2. **Chat-based Storyteller**: Build a chatbot that allows
+# users to interact with a story, making choices and receiving
+# responses in real-time.
+# 3. **Quote Machine**: Develop a tool that uses an LLM to
+# generate quotes on various topics, such as inspiration,
+# motivation, or humor.
+# 4. **Mad Libs Generator**: Create a web app that uses an LMM
+# to fill in the blanks for a Mad Libs story, with user-inputted
+# words and phrases.
+# 5. **Language Translation Game**: Build a game where users can
+# practice their language skills by translating simple sentences
+# from one language to another using an LLM as a guide.
+# 6. **Creative Writing Assistant**: Develop a tool that uses an
+# LMM to assist users in writing short stories, providing
+# suggestions for plot twists, character development, and more.
+# 7. **Joke Generator**: Create a web app that uses an LMM to
+# generate jokes on various topics, such as puns or one-liners.
+# 8. **Trivia Game with LLM-Generated Questions**: Build a
+# trivia game where questions are generated by an LMM based on
+# user input, making the game more dynamic and challenging.
+
+# These projects can be fun and engaging for both developers and
+# readers, and they demonstrate the potential of Large Language
+# Models in various applications.
+
+# Do you have any specific ideas or interests that might
+# influence which project to choose?
+```
+
+This is fun and all, but not useful if you would want to incorporate it within another app.
+The [ollama GitHub](https://github.com/ollama/ollama) informs about the possibility of a REST API.
+We can either generate a response or chat with a model:
+
+```{.bash filename=Terminal}
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama3.1",
+  "prompt":"1+1"
+}'
+# {"model":"llama3.1","created_at":"2024-08-30T23:40:24.049106904Z","response":"2","done":false}
+# {"model":"llama3.1","created_at":"2024-08-30T23:40:24.074101564Z","response":"","done":true,"done_reason":"stop","context":[128009,128006,882,128007,271,16,10,16,128009,128006,78191,128007,271,17],"total_duration":156809444,"load_duration":34474956,"prompt_eval_count":14,"prompt_eval_duration":54148000,"eval_count":2,"eval_duration":24937000}
+```
+
+Seems good to me!
+If you are unfamiliar with LLMs, the output looks quite strange.
+For a more difficult prompt, the API will return more JSON objects which can be somewhat cumbersome to handle.
+Fortunately there are frameworks out there, such as [LangChain](https://www.langchain.com/), [LlamaIndex](https://www.llamaindex.ai/) and [Haystack](https://haystack.deepset.ai/).
+In the next part we will try to use the local LLM in a more app-oriented way.
+That’s all for today, thanks for reading!
