@@ -11,7 +11,7 @@ It consists of:
 
 -   GPU: [MSI GeForce GTX 1080 GAMING X 8G](https://tweakers.net/pricewatch/545523/msi-geforce-gtx-1080-gaming-x-8g/specificaties/)
 -   CPU: [AMD Ryzen 5 3600X](https://tweakers.net/pricewatch/1390254/amd-ryzen-5-3600x-boxed/specificaties/)
--   RAM: [2x 8GB Corsair Vengeance LPX 32000](link)
+-   RAM: [2x 8GB Corsair Vengeance LPX 3200](link)
 
 And of course some other components, but as long as the power supply is sufficient, the others are irrelevant.
 For other projects and with the state of AI, I would like to convert it to a machine which hosts a Large Language Model and serve it with an API.
@@ -46,6 +46,13 @@ Smooth sailing!
 
 The boot was succesful and there are a few things remaining before we are ready to use the GPU.
 As the user account we used to log in is new, we have to add them to de `sudo` group.
+The only problem is that can only be done as root, so if you had logged in with a non-root user, try the following command:
+
+```{.bash filename=Terminal}
+su root
+```
+
+This should switch the user to `root` and allow for adding users and using `sudo` commands in general.
 
 ```{.bash filename=Terminal}
 sudo adduser <username> sudo
@@ -59,9 +66,10 @@ deb http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmwa
 ```
 
 In particular, check if `contrib`, `non-free`, and `non-free-firmware` are included.
-Then I would recommend installing the small `nvidia-detect` package:
+Then I would recommend installing the small `nvidia-detect` package, but make sure to update the package list:
 
 ```{.bash filename=Terminal}
+sudo apt update
 sudo apt install nvidia-detect
 nvidia-detect
 ```
