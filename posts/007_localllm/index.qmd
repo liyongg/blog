@@ -3,6 +3,7 @@ title: "Hosting an LLM using my old PC: part 1"
 date: "2024-08-28"
 categories: [large language model, hardware]
 description: "Local LLMs?"
+image: llama.png
 ---
 
 I promised to reward myself with a new PC once I started with a new job.
