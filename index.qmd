@@ -26,16 +26,16 @@ When I'm not doing tech savvy things, you'll likely find me enjoying video games
 I thrive on solving challenging problems, and often find myself thinking faster than I speak & speaking faster than I think.
 Every day, I enjoy pondering ways to *game the system* and exploring questions that often go unnoticed. 
 
+### Experience
+
+Data Scientist \| [![nn-logo](nn.svg){style="height: 1em; vertical-align: baseline"} Nationale-Nederlanden](https://www.nn.nl/){style="color: #FF5200; text-decoration: none"} \| 2024 - now
+
+Data Scientist \| [![rijks-logo](rijks.svg){style="height: 1em; vertical-align: baseline"} Ministry of Education, Culture and Science](https://www.rijksoverheid.nl/ministeries/ministerie-van-onderwijs-cultuur-en-wetenschap){style="color: #154273; text-decoration: none"} \| 2021 - 2024
+
+Junior Data Scientist \| [![apeiron-logo](apeiron.svg){style="height: 1em; vertical-align: baseline"} Apeiron Insight](https://apeironinsight.com/){style="color: #6f3d94; text-decoration: none"} \| 2019 - 2021
+
 ### Education
 
 MSc Applied Mathematics \| Delft University of Technology \| 2018 - 2020
 
 BSc Applied Mathematics \| Delft University of Technology \| 2015 - 2018
-
-### Experience
-
-Data Scientist \| Nationale-Nederlanden \| 2024 - now
-
-Data Scientist \| Ministry of Education, Culture and Science \| 2021 - 2024
-
-Junior Data Scientist \| Apeiron Insight \| 2019 - 2021
