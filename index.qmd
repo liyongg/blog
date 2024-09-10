@@ -1,6 +1,6 @@
 ---
 title: "Li Yong Pan"
-image: profile.jpeg
+image: media/profile.jpeg
 about:
   template: trestles
   links:
@@ -28,11 +28,11 @@ Every day, I enjoy pondering ways to *game the system* and exploring questions t
 
 ### Experience
 
-Data Scientist \| [![nn-logo](nn.svg){style="height: 1em; vertical-align: baseline"} Nationale-Nederlanden](https://www.nn.nl/){style="color: #FF5200; text-decoration: none"} \| 2024 - now
+Data Scientist \| [![nn-logo](media/nn.svg){style="height: 1em; vertical-align: baseline"} Nationale-Nederlanden](https://www.nn.nl/){style="color: #FF5200; text-decoration: none"} \| 2024 - now
 
-Data Scientist \| [![rijks-logo](rijks.svg){style="height: 1em; vertical-align: baseline"} Ministry of Education, Culture and Science](https://www.rijksoverheid.nl/ministeries/ministerie-van-onderwijs-cultuur-en-wetenschap){style="color: #154273; text-decoration: none"} \| 2021 - 2024
+Data Scientist \| [![rijks-logo](media/rijks.svg){style="height: 1em; vertical-align: baseline"} Ministry of Education, Culture and Science](https://www.rijksoverheid.nl/ministeries/ministerie-van-onderwijs-cultuur-en-wetenschap){style="color: #154273; text-decoration: none"} \| 2021 - 2024
 
-Junior Data Scientist \| [![apeiron-logo](apeiron.svg){style="height: 1em; vertical-align: baseline"} Apeiron Insight](https://apeironinsight.com/){style="color: #6f3d94; text-decoration: none"} \| 2019 - 2021
+Junior Data Scientist \| [![apeiron-logo](media/apeiron.svg){style="height: 1em; vertical-align: baseline"} Apeiron Insight](https://apeironinsight.com/){style="color: #6f3d94; text-decoration: none"} \| 2019 - 2021
 
 ### Education
 
