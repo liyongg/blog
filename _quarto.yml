@@ -5,13 +5,13 @@ website:
   title: Li Yong Pan
   site-url: https://blog.panliyong.nl
   description: "Personal blog of Li Yong Pan"
-  favicon: handsign.svg
-  image: handsign.svg
+  favicon: media/handsign.svg
+  image: media/handsign.svg
   google-analytics: G-HBT8Z7VKEK
   page-navigation: true
   back-to-top-navigation: true
   navbar:
-    logo: handsign.svg
+    logo: media/handsign.svg
     collapse-below: sm
     toggle-position: right
     right:
