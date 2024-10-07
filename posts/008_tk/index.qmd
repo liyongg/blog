@@ -1,6 +1,6 @@
 ---
 title: "Visually finding a statistical *Toni Kroos* replacement"
-date: "2024-09-24"
+date: "2024-10-07"
 categories: [visualisation]
 description: "Irreplacable"
 code-fold: show
@@ -21,9 +21,8 @@ Fortunately the Kaggle dataset also showed the source and it was quite easy to f
 ## Step 1: Obtaining the data
 
 After clicking around on [FBREF](https://fbref.com/en/comps/Big5/stats/players/Big-5-European-Leagues-Stats), I found the player stats of the 2023-2024 season, so let's get digging!
-<!-- [](https://fbref.com/en/comps/Big5/2023-2024/stats/players/2023-2024-Big-5-European-Leagues-Stats) -->
 
-![.. *Diglett Dig Diglett Dig Diglett Dig Diglett Dig* ...](https://media1.tenor.com/m/-k2lIRMzytEAAAAC/jukemon.gif)
+![... *Diglett Dig Diglett Dig Diglett Dig Diglett Dig* ...](https://media1.tenor.com/m/-k2lIRMzytEAAAAC/jukemon.gif)
 
 The data is not yet in an easy format to work with.
 We could opt for `pd.read_html()` method, but that's no fun!
