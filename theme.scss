@@ -10,6 +10,11 @@ $font-family-monospace: "Jetbrains Mono";
 
 /*-- scss:rules --*/
 
+.figure {
+    margin: auto;
+    text-align: center;
+}
+
 .about-links > a.about-link,
 a.nav-link {
     &:hover {
