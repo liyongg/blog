@@ -509,7 +509,7 @@ fig_3d = px.scatter_3d(
     labels={"color": ""},
 )
 fig_3d.update_traces(
-    marker_size=5,
+    marker_size=3,
     hovertemplate="<br>".join(
         [
             "Player: %{customdata[0]}",
@@ -561,7 +561,7 @@ In the 3D embedding, it is quite extraordinary to see a defenders close to him a
 The one that is closes is *Trent Alexander-Arnold*, who plays for Liverpool in the Premier League.
 He is known to be an amazing creator, but usually plays right-back.
 There are some rumours about him joining Real Madrid as a free agent in 2025, so who knows...
-👀qu
+👀
 
 ## TL;DR
 
