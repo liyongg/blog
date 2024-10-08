@@ -1,6 +1,6 @@
 ---
 title: "Visually finding a statistical *Toni Kroos* replacement"
-date: "2024-09-24"
+date: "2024-10-07"
 categories: [visualisation]
 description: "Irreplacable"
 code-fold: show
@@ -21,9 +21,8 @@ Fortunately the Kaggle dataset also showed the source and it was quite easy to f
 ## Step 1: Obtaining the data
 
 After clicking around on [FBREF](https://fbref.com/en/comps/Big5/stats/players/Big-5-European-Leagues-Stats), I found the player stats of the 2023-2024 season, so let's get digging!
-<!-- [](https://fbref.com/en/comps/Big5/2023-2024/stats/players/2023-2024-Big-5-European-Leagues-Stats) -->
 
-![.. *Diglett Dig Diglett Dig Diglett Dig Diglett Dig* ...](https://media1.tenor.com/m/-k2lIRMzytEAAAAC/jukemon.gif)
+![... *Diglett Dig Diglett Dig Diglett Dig Diglett Dig* ...](https://media1.tenor.com/m/-k2lIRMzytEAAAAC/jukemon.gif)
 
 The data is not yet in an easy format to work with.
 We could opt for `pd.read_html()` method, but that's no fun!
@@ -510,7 +509,7 @@ fig_3d = px.scatter_3d(
     labels={"color": ""},
 )
 fig_3d.update_traces(
-    marker_size=5,
+    marker_size=3,
     hovertemplate="<br>".join(
         [
             "Player: %{customdata[0]}",
@@ -562,7 +561,7 @@ In the 3D embedding, it is quite extraordinary to see a defenders close to him a
 The one that is closes is *Trent Alexander-Arnold*, who plays for Liverpool in the Premier League.
 He is known to be an amazing creator, but usually plays right-back.
 There are some rumours about him joining Real Madrid as a free agent in 2025, so who knows...
-👀qu
+👀
 
 ## TL;DR
 
